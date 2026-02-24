@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mexicanos en el Mundo – Indicadores Económicos</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { outfit: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        night: '#0d0d1a',
+                        card: '#13132a',
+                        border: '#1e1e3a',
+                        accent: '#e84c3d',
+                        gold: '#f59e0b',
+                        teal: '#14b8a6',
+                        purple: '#7c3aed',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ── NAV BAR ── */
+        #top-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 24px;
+            background: rgba(13, 13, 26, 0.80);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #top-navbar .brand {
+            font-size: 13px;
+            font-weight: 700;
+            color: #f59e0b;
+            letter-spacing: 1px;
+            margin-right: 12px;
+            text-transform: uppercase;
+        }
+
+        #top-navbar a {
+            text-decoration: none;
+            color: #9ca3af;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: all 0.25s;
+            border: 1px solid transparent;
+        }
+
+        #top-navbar a:hover {
+            color: #fff;
+            background: rgba(124, 58, 237, 0.25);
+            border-color: rgba(124, 58, 237, 0.5);
+        }
+
+        #top-navbar a.active-tab {
+            color: #fff;
+            background: rgba(232, 76, 61, 0.35);
+            border-color: rgba(232, 76, 61, 0.6);
+        }
+
+        /* ── SLIDES ── */
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0d0d1a;
+            color: #f1f1f1;
+            overflow: hidden;
+        }
+
+        .slide-wrapper {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            opacity: 0;
+            transform: translateX(80px);
+            transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1), transform 0.5s cubic-bezier(.4, 0, .2, 1);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .slide.exit-left {
+            opacity: 0;
+            transform: translateX(-80px);
+        }
+
+        /* ── PROGRESS BAR ── */
+        #progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: #e84c3d;
+            transition: width 0.45s ease;
+            z-index: 9999;
+        }
+
+        /* ── NAV BUTTONS ── */
+        .nav-btn {
+            position: fixed;
+            bottom: 28px;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 10px 28px;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(232, 76, 61, 0.3);
+            border-color: #e84c3d;
+        }
+
+        #btn-prev {
+            left: 50%;
+            transform: translateX(-140px);
+        }
+
+        #btn-next {
+            left: 50%;
+            transform: translateX(20px);
+        }
+
+        /* ── SLIDE COUNTER ── */
+        #slide-counter {
+            position: fixed;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #6b7280;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* ── DATA CARDS ── */
+        .data-card {
+            background: #13132a;
+            border: 1px solid #1e1e3a;
+            border-radius: 14px;
+            padding: 20px 24px;
+            transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+        }
+
+        .data-card:hover {
+            transform: translateY(-6px);
+            border-color: #7c3aed;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.25);
+        }
+
+        /* ── BACKGROUND GRID ── */
+        .slide-wrapper {
+            background-image: radial-gradient(#1a1a35 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        /* ── SLIDE 1: HERO ── */
+        .flag-stripe-green {
+            background: #006847;
+        }
+
+        .flag-stripe-white {
+            background: #f1f1f1;
+        }
+
+        .flag-stripe-red {
+            background: #ce1126;
+        }
+
+        /* Animate in text */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide.active .anim {
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .slide.active .anim:nth-child(2) {
+            animation-delay: 0.15s;
+            opacity: 0;
+        }
+
+        .slide.active .anim:nth-child(3) {
+            animation-delay: 0.30s;
+            opacity: 0;
+        }
+
+        .slide.active .anim:nth-child(4) {
+            animation-delay: 0.45s;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP NAV BAR -->
+    <div id="top-navbar">
+        <span class="brand">⚡ INGeólicos</span>
+        <a href="index.html">🖥️ Presentación</a>
+        <a href="MapaConceptual_Indicadores.html">🗺️ Mapa Conceptual</a>
+        <a href="MexicoEnElMundo.html" class="active-tab">🌎 Presentación 3</a>
+    </div>
+
+    <!-- SLIDES WRAPPER -->
+    <div class="slide-wrapper">
+
+        <!-- ══ SLIDE 1: PORTADA ══ -->
+        <section class="slide active" id="slide-1">
+            <div class="flex flex-col items-center text-center max-w-3xl">
+                <!-- Mini bandera -->
+                <div class="flex mb-8 rounded-lg overflow-hidden shadow-2xl" style="height:8px; width:240px;">
+                    <div class="flex-1 flag-stripe-green"></div>
+                    <div class="flex-1 flag-stripe-white"></div>
+                    <div class="flex-1 flag-stripe-red"></div>
+                </div>
+                <div class="anim text-sm font-semibold tracking-widest text-gold uppercase mb-3">Indicadores Económicos
+                    · 2026</div>
+                <h1 class="anim text-6xl font-extrabold leading-tight mb-4">
+                    Mexicanos<br><span class="text-accent">en el Mundo</span>
+                </h1>
+                <p class="anim text-xl text-gray-400 max-w-xl mb-6">
+                    Un análisis a través de indicadores económicos y estadísticos.
+                </p>
+                <div
+                    class="anim inline-block border border-gray-700 rounded-2xl px-6 py-3 bg-card text-gray-400 text-sm">
+                    🔍 Aplicación de conceptos de <strong class="text-teal">flujos</strong>, <strong
+                        class="text-purple-400">acervos</strong> y <strong class="text-gold">tasas</strong> a la
+                    diáspora mexicana
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ SLIDE 2: ACERVOS VS FLUJOS ══ -->
+        <section class="slide" id="slide-2">
+            <div class="max-w-4xl w-full">
+                <div class="anim text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 2 · Marco Teórico</div>
+                <h2 class="anim text-4xl font-bold mb-8">Acervos <span class="text-gray-500">vs.</span> Flujos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Acervo -->
+                    <div class="data-card anim">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-content-center"
+                                style="background:rgba(124,58,237,0.2); display:flex; align-items:center; justify-content:center;">
+                                <span class="text-xl">🏛️</span>
+                            </div>
+                            <span class="text-purple-400 font-bold text-lg">Acervo (Stock)</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            Representa el <strong class="text-white">total</strong> de mexicanos que residen fuera del
+                            país
+                            <strong class="text-purple-300"> en un momento dado</strong>.
+                        </p>
+                        <div class="mt-4 rounded-xl p-4 text-center"
+                            style="background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.3);">
+                            <span class="text-3xl font-extrabold text-purple-400">~12.3 M</span>
+                            <p class="text-xs text-gray-500 mt-1">mexicanos en el exterior (dato de corte)</p>
+                        </div>
+                    </div>
+                    <!-- Flujo -->
+                    <div class="data-card anim">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full flex items-center"
+                                style="background:rgba(20,184,166,0.2); display:flex; align-items:center; justify-content:center;">
+                                <span class="text-xl">🔄</span>
+                            </div>
+                            <span class="text-teal font-bold text-lg">Flujo</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            Representa el <strong class="text-white">movimiento neto</strong> de personas que salen o
+                            regresan
+                            a México <strong class="text-teal">en un periodo determinado</strong> (un año).
+                        </p>
+                        <div class="mt-4 rounded-xl p-4 text-center"
+                            style="background:rgba(20,184,166,0.1); border:1px solid rgba(20,184,166,0.3);">
+                            <span class="text-lg font-bold text-teal">Δ anual de entradas y salidas</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Nota -->
+                <div class="anim mt-6 rounded-xl p-4 flex gap-3 items-start"
+                    style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25);">
+                    <span class="text-gold text-lg mt-0.5">⚠️</span>
+                    <p class="text-gray-400 text-sm">
+                        <strong class="text-gold">Nota clave:</strong> No confundir el total acumulado (acervo) con el
+                        movimiento anual (flujo).
+                        Son medidas distintas que responden preguntas distintas.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ SLIDE 3: PONDERACIÓN GEOGRÁFICA ══ -->
+        <section class="slide" id="slide-3">
+            <div class="max-w-4xl w-full">
+                <div class="text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 3 · Distribución</div>
+                <h2 class="text-4xl font-bold mb-2">Ponderación <span class="text-accent">Geográfica</span></h2>
+                <p class="text-gray-400 mb-6">El índice de distribución está <strong class="text-white">altamente
+                        concentrado</strong>.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <!-- Chart -->
+                    <div class="data-card flex items-center justify-center" style="height:280px;">
+                        <canvas id="diasporaChart"></canvas>
+                    </div>
+                    <!-- Stats -->
+                    <div class="flex flex-col gap-4">
+                        <div class="data-card">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-white">🇺🇸 Estados Unidos</span>
+                                <span class="text-2xl font-extrabold text-accent">97%</span>
+                            </div>
+                            <div class="w-full rounded-full h-2" style="background:#1e1e3a;">
+                                <div class="h-2 rounded-full" style="width:97%; background:#e84c3d;"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Principal destino de la diáspora mexicana</p>
+                        </div>
+                        <div class="data-card">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-white">🌐 Resto del Mundo</span>
+                                <span class="text-2xl font-extrabold text-teal">3%</span>
+                            </div>
+                            <div class="w-full rounded-full h-2" style="background:#1e1e3a;">
+                                <div class="h-2 rounded-full" style="width:3%; background:#14b8a6;"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Canadá, España, Alemania y otros</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ SLIDE 4: REMESAS NOMINAL VS REAL ══ -->
+        <section class="slide" id="slide-4">
+            <div class="max-w-4xl w-full">
+                <div class="text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 4 · Análisis Monetario</div>
+                <h2 class="text-4xl font-bold mb-2">Remesas – Valor <span class="text-gold">Nominal</span> vs. <span
+                        class="text-teal">Real</span></h2>
+                <p class="text-gray-400 mb-6">Las remesas son un <strong class="text-white">flujo de divisas
+                        vital</strong> para México.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="data-card md:col-span-1 flex flex-col justify-center items-center text-center">
+                        <span class="text-4xl mb-3">💸</span>
+                        <span class="text-3xl font-extrabold text-gold">+10%</span>
+                        <p class="text-xs text-gray-400 mt-2">Incremento nominal de remesas</p>
+                    </div>
+                    <div class="data-card md:col-span-1 flex flex-col justify-center items-center text-center">
+                        <span class="text-4xl mb-3">📈</span>
+                        <span class="text-3xl font-extrabold text-accent">–8%</span>
+                        <p class="text-xs text-gray-400 mt-2">Inflación en México (pérdida de poder adquisitivo)</p>
+                    </div>
+                    <div class="data-card md:col-span-1 flex flex-col justify-center items-center text-center">
+                        <span class="text-4xl mb-3">💱</span>
+                        <span class="text-3xl font-extrabold text-purple-400">Apreciación</span>
+                        <p class="text-xs text-gray-400 mt-2">Del peso mexicano reduce el valor en MXN</p>
+                    </div>
+                    <!-- Resultado -->
+                    <div class="data-card md:col-span-3 mt-1">
+                        <div class="flex gap-4 items-center">
+                            <div class="text-4xl">⚖️</div>
+                            <div>
+                                <p class="text-white font-semibold mb-1">Resultado del Análisis:</p>
+                                <p class="text-gray-300 text-sm leading-relaxed">
+                                    Para entender el impacto verdadero, debemos <strong class="text-teal">deflactar el
+                                        monto nominal</strong>.
+                                    Si las remesas suben 10% pero la inflación es de 8% y el peso se aprecia,
+                                    el valor real (poder adquisitivo) para las familias mexicanas
+                                    <strong class="text-accent">puede incluso disminuir</strong>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ SLIDE 5: ESTACIONALIDAD ══ -->
+        <section class="slide" id="slide-5">
+            <div class="max-w-4xl w-full">
+                <div class="text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 5 · Series de Tiempo</div>
+                <h2 class="text-4xl font-bold mb-2">Estacionalidad y <span class="text-teal">Efectos de
+                        Calendario</span></h2>
+                <p class="text-gray-400 mb-6">El envío de dinero y el flujo migratorio tienen <strong
+                        class="text-white">patrones cíclicos</strong>.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Picos -->
+                    <div class="flex flex-col gap-4">
+                        <div class="data-card flex gap-4 items-center">
+                            <div class="text-4xl">💐</div>
+                            <div>
+                                <p class="font-bold text-white">Mayo – Día de las Madres</p>
+                                <p class="text-gray-400 text-sm mt-1">Pico recurrente en envío de remesas. Incremento
+                                    estacional documentado año tras año.</p>
+                            </div>
+                        </div>
+                        <div class="data-card flex gap-4 items-center">
+                            <div class="text-4xl">🎄</div>
+                            <div>
+                                <p class="font-bold text-white">Diciembre – Navidad</p>
+                                <p class="text-gray-400 text-sm mt-1">Segundo pico mayor del año. También coincide con
+                                    retorno temporal de migrantes a México.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Ajuste -->
+                    <div class="data-card flex flex-col justify-center">
+                        <div class="flex gap-3 items-start mb-4">
+                            <span class="text-2xl">🔧</span>
+                            <p class="text-white font-semibold">Ajuste Estacional</p>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            Para saber si la migración <em class="text-white">"realmente"</em> aumentó en un mes,
+                            debemos usar <strong class="text-teal">cifras desestacionalizadas</strong> para eliminar
+                            estos efectos
+                            repetitivos anuales.
+                        </p>
+                        <div class="mt-4 rounded-xl p-3 text-center text-xs text-gray-500"
+                            style="background:rgba(20,184,166,0.07); border:1px solid rgba(20,184,166,0.2);">
+                            Dato original − Componente estacional = <strong class="text-teal">Valor ajustado</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ SLIDE 6: FUENTES DE INFORMACIÓN ══ -->
+        <section class="slide" id="slide-6">
+            <div class="max-w-4xl w-full">
+                <div class="text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 6 · Referencias</div>
+                <h2 class="text-4xl font-bold mb-2">Fuentes de <span class="text-gold">Información</span></h2>
+                <p class="text-gray-400 mb-6">Los datos provienen de organismos con distintos <strong
+                        class="text-white">calendarios de difusión</strong>.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="data-card text-center">
+                        <div class="text-4xl mb-3">🏦</div>
+                        <h3 class="font-bold text-gold mb-2">Banco de México</h3>
+                        <p class="text-gray-400 text-sm">Reportes <strong class="text-white">mensuales</strong> de
+                            remesas. Fuente primaria para flujos de divisas al país.</p>
+                        <div class="mt-3 text-xs px-3 py-1 rounded-full inline-block"
+                            style="background:rgba(245,158,11,0.12); color:#f59e0b;">Periodicidad: Mensual</div>
+                    </div>
+                    <div class="data-card text-center">
+                        <div class="text-4xl mb-3">🛂</div>
+                        <h3 class="font-bold text-teal mb-2">IME (SRE)</h3>
+                        <p class="text-gray-400 text-sm">Estadísticas de mexicanos en el exterior. Coordina la red
+                            consular a nivel mundial.</p>
+                        <div class="mt-3 text-xs px-3 py-1 rounded-full inline-block"
+                            style="background:rgba(20,184,166,0.12); color:#14b8a6;">Periodicidad: Anual</div>
+                    </div>
+                    <div class="data-card text-center">
+                        <div class="text-4xl mb-3">🇺🇸</div>
+                        <h3 class="font-bold text-purple-400 mb-2">Censo EE. UU. (ACS)</h3>
+                        <p class="text-gray-400 text-sm">La fuente primaria para el <strong
+                                class="text-white">acervo</strong> de mexicanos en territorio estadounidense.</p>
+                        <div class="mt-3 text-xs px-3 py-1 rounded-full inline-block"
+                            style="background:rgba(124,58,237,0.12); color:#a78bfa;">Periodicidad: Anual</div>
+                    </div>
+                </div>
+                <!-- Final CTA -->
+                <div class="mt-6 text-center">
+                    <p class="text-gray-500 text-sm">INGeólicos · 2026 — <span class="text-accent">Mexicanos en el
+                            Mundo</span></p>
+                </div>
+            </div>
+        </section>
+
+    </div><!-- end slide-wrapper -->
+
+    <!-- Navigation Buttons -->
+    <button class="nav-btn" id="btn-prev">← Anterior</button>
+    <div id="slide-counter">1 / 6</div>
+    <button class="nav-btn" id="btn-next">Siguiente →</button>
+
+    <!-- Progress Bar -->
+    <div id="progress-bar"></div>
+
+    <script>
+        // ── SLIDE LOGIC ──
+        const slides = document.querySelectorAll('.slide');
+        const counter = document.getElementById('slide-counter');
+        const progressBar = document.getElementById('progress-bar');
+        let current = 0;
+
+        function goTo(index) {
+            const prev = current;
+            current = Math.max(0, Math.min(slides.length - 1, index));
+            if (prev === current) return;
+
+            // Direction
+            slides[prev].classList.remove('active');
+            slides[prev].classList.add('exit-left');
+            setTimeout(() => slides[prev].classList.remove('exit-left'), 500);
+
+            slides[current].classList.add('active');
+
+            // Counter
+            counter.textContent = `${current + 1} / ${slides.length}`;
+
+            // Progress Bar
+            progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
+
+            // Draw chart on slide 3
+            if (current === 2) initChart();
+        }
+
+        document.getElementById('btn-next').addEventListener('click', () => goTo(current + 1));
+        document.getElementById('btn-prev').addEventListener('click', () => goTo(current - 1));
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+        });
+
+        // Init progress
+        progressBar.style.width = `${(1 / slides.length) * 100}%`;
+
+        // ── CHART.JS ──
+        let chartCreated = false;
+        function initChart() {
+            if (chartCreated) return;
+            chartCreated = true;
+            const ctx = document.getElementById('diasporaChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['EE. UU. (97%)', 'Resto del Mundo (3%)'],
+                    datasets: [{
+                        data: [97, 3],
+                        backgroundColor: ['#e84c3d', '#14b8a6'],
+                        borderColor: ['#0d0d1a'],
+                        borderWidth: 4,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#d1d5db',
+                                font: { family: 'Outfit', size: 12 },
+                                padding: 16
+                            }
+                        },
+                        tooltip: {
+                            bodyFont: { family: 'Outfit' },
+                            callbacks: {
+                                label: (ctx) => ` ${ctx.label}: ${ctx.raw}%`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>
