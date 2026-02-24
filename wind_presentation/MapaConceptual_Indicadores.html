@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Conceptual: Indicadores Económicos</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- ESTILOS GENERALES (Jerarquía & Iconos) --- */
+        :root {
+            --bg-color: #1e1e2f;
+            --text-color: #f1f1f1;
+
+            /* Paleta Oficial */
+            --color-purple: #7565D6;
+            --color-pink: #D6658E;
+            --color-teal: #65D6AD;
+            --color-lime: #C7D665;
+
+            /* Variables de Línea */
+            --line-color: #5a5a7e;
+            /* Un poco más sutil que el púrpura brillante para las líneas */
+            --line-width: 2px;
+            /* Más fino para elegancia */
+
+            --node-bg-root: var(--color-purple);
+            --node-bg-level1: var(--color-pink);
+            --node-bg-level2: var(--color-teal);
+            --node-bg-level3: var(--color-lime);
+
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #viewport {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            cursor: grab;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(#2e2e42 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        #map-container {
+            transform-origin: center center;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform: scale(0.9);
+        }
+
+        /* --- MENÚ DE NAVEGACIÓN --- */
+        #nav-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(30, 30, 47, 0.95);
+            border: 1px solid var(--line-color);
+            border-radius: 12px;
+            padding: 15px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-title {
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: #ddd;
+            text-align: left;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-family: var(--font-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(117, 101, 214, 0.3);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        .nav-btn i {
+            width: 15px;
+            text-align: center;
+            color: var(--color-teal);
+        }
+
+        /* --- ARBOL Y CONECTORES --- */
+        .tree {
+            white-space: nowrap;
+        }
+
+        .tree ul {
+            padding-top: 45px !important;
+            position: relative;
+            transition: all 0.5s;
+            display: flex;
+            justify-content: center;
+        }
+
+        .tree li {
+            float: left;
+            text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 25px 10px 0 10px;
+            transition: all 0.5s;
+        }
+
+        /* Conectores Standard */
+        .tree li::before,
+        .tree li::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 50%;
+            border-top: var(--line-width) solid var(--line-color);
+            width: 50%;
+            height: 25px;
+        }
+
+        .tree li::after {
+            right: auto;
+            left: 50%;
+            border-left: var(--line-width) solid var(--line-color);
+        }
+
+        .tree li:only-child::after,
+        .tree li:only-child::before {
+            display: none;
+        }
+
+        .tree li:only-child {
+            padding-top: 0;
+        }
+
+        .tree li:first-child::before,
+        .tree li:last-child::after {
+            border: 0 none;
+        }
+
+        .tree li:last-child::before {
+            border-right: var(--line-width) solid var(--line-color);
+            border-radius: 0 5px 0 0;
+        }
+
+        .tree li:first-child::after {
+            border-radius: 5px 0 0 0;
+        }
+
+        .tree ul ul::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            border-left: var(--line-width) solid var(--line-color);
+            width: 0;
+            height: 45px;
+        }
+
+        /* --- ETIQUETAS --- */
+        .connector-text {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 15px;
+            text-align: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .connector-text span {
+            background-color: var(--bg-color);
+            color: #888;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- NODOS: ESTILO BASE & ICONOS --- */
+        .node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            color: #fff;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            white-space: normal;
+            position: relative;
+            z-index: 10;
+        }
+
+        .node i {
+            font-size: 2em;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+        }
+
+        .node span.label {
+            display: block;
+            line-height: 1.2;
+        }
+
+        .node small {
+            display: block;
+            margin-top: 4px;
+            opacity: 0.8;
+            font-weight: normal;
+        }
+
+        .node:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            filter: brightness(1.15);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* --- JERARQUÍA DE TAMAÑOS Y COLORES --- */
+
+        /* NIVEL 0: Raíz (Masivo) */
+        .level-0 .node {
+            background: linear-gradient(135deg, var(--node-bg-root), #5b4db8);
+            padding: 25px 40px;
+            min-width: 250px;
+            font-size: 20px;
+            font-weight: 800;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .level-0 .node i {
+            font-size: 3em;
+            margin-bottom: 12px;
+        }
+
+        /* NIVEL 1: Categorías (Grande) */
+        .level-1>.node {
+            background: linear-gradient(135deg, var(--node-bg-level1), #b05473);
+            padding: 18px 25px;
+            min-width: 180px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .level-1>.node i {
+            font-size: 2em;
+        }
+
+        /* NIVEL 2: Subtemas (Medio) */
+        .level-2 .node {
+            background: var(--node-bg-level2);
+            color: #0f2c25;
+            /* Texto oscuro para contraste con Teal */
+            padding: 12px 20px;
+            min-width: 140px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .level-2 .node i {
+            color: #0f2c25;
+            font-size: 1.5em;
+        }
+
+        /* NIVEL 3: Detalles (Pequeño) */
+        .level-3 .node {
+            background: var(--node-bg-level3);
+            color: #2c2f0f;
+            /* Texto oscuro para contraste con Lime */
+            padding: 8px 15px;
+            min-width: 100px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .level-3 .node i {
+            font-size: 1.2em;
+            margin-bottom: 4px;
+        }
+
+
+        /* Controles de Zoom */
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .btn-control {
+            background: #2d3436;
+            border: 1px solid #555;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-control:hover {
+            background: var(--color-purple);
+            border-color: var(--color-purple);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="nav-menu">
+        <div class="nav-title">Navegación</div>
+        <button class="nav-btn" onclick="scrollToNode('node-i')">I. Naturaleza</button>
+        <button class="nav-btn" onclick="scrollToNode('node-ii')">II. Números Índice</button>
+        <button class="nav-btn" onclick="scrollToNode('node-iii')">III. Variaciones</button>
+        <button class="nav-btn" onclick="scrollToNode('node-iv')">IV. Series Tiempo</button>
+        <button class="nav-btn" onclick="scrollToNode('node-v')">V. Infraestructura</button>
+        <button class="nav-btn" onclick="resetZoom()" style="margin-top:5px; border-top:1px solid #444;">↺ Centrar
+            Todo</button>
+    </div>
+
+    <div id="controls">
+        <button class="btn-control" onclick="zoomIn()">+</button>
+        <button class="btn-control" onclick="zoomOut()">-</button>
+        <button class="btn-control" onclick="resetZoom()">↺</button>
+    </div>
+
+    <div id="viewport">
+        <div id="map-container" class="tree">
+            <ul>
+                <li class="level-0">
+                    <div class="node">Aspectos Conceptuales y Estadísticos</div>
+                    <div class="connector-text"><span>se dividen en</span></div>
+                    <ul>
+
+                        <!-- ID Agregados para navegación -->
+                        <li class="level-1" id="node-i">
+                            <div class="node">I. Naturaleza de las Variables</div>
+                            <ul>
+                                <li class="level-2">
+                                    <div class="connector-text" style="top:-10px"><span>tipos</span></div>
+                                    <div class="node">Flujos<br><small>(Intervalo)</small></div>
+                                </li>
+                                <li class="level-2">
+                                    <div class="node">Acervos / Stocks<br><small>(Momento)</small></div>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="level-1" id="node-ii">
+                            <div class="node">II. Números Índice</div>
+                            <ul>
+                                <li class="level-2">
+                                    <div class="connector-text" style="top:-10px"><span>elementos</span></div>
+                                    <div class="node">Conceptos Clave</div>
+                                    <div class="connector-text"><span>incluye</span></div>
+                                    <!-- Nivel 3 vuelve a horizontal (flex row) para ahorrar verticalidad si se quiere, 
+                                         pero mantengamos consistencia vertical stack -->
+                                    <ul>
+                                        <li class="level-3">
+                                            <div class="node">Periodo Base (100)</div>
+                                        </li>
+                                        <li class="level-3">
+                                            <div class="node">Ponderación</div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="level-2">
+                                    <div class="node">Valor Nominal vs Real</div>
+                                    <ul>
+                                        <li class="level-3">
+                                            <div class="node">Deflactación</div>
+                                            <ul>
+                                                <li>
+                                                    <div class="node">Precios Corrientes</div>
+                                                </li>
+                                                <li>
+                                                    <div class="node">Precios Constantes</div>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="level-1" id="node-iii">
+                            <div class="node">III. Medición de Variaciones</div>
+                            <ul>
+                                <li class="level-2">
+                                    <div class="connector-text" style="top:-10px"><span>indicadores</span></div>
+                                    <div class="node">Tasa Anual</div>
+                                </li>
+                                <li class="level-2">
+                                    <div class="node">Tasa Anualizada</div>
+                                </li>
+                                <li class="level-2">
+                                    <div class="node">Promedio Anual</div>
+                                </li>
+                                <li class="level-2">
+                                    <div class="node">Acumulada</div>
+                                </li>
+                                <li class="level-2">
+                                    <div class="node">Puntos %</div>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="level-1" id="node-iv">
+                            <div class="node">IV. Series de Tiempo</div>
+                            <ul>
+                                <li class="level-2">
+                                    <div class="connector-text" style="top:-10px"><span>análisis</span></div>
+                                    <div class="node">Originales</div>
+                                </li>
+                                <li class="level-2">
+                                    <div class="node">Ajustes</div>
+                                    <ul>
+                                        <li class="level-3">
+                                            <div class="node">Estacionalidad</div>
+                                        </li>
+                                        <li class="level-3">
+                                            <div class="node">Ajuste Estacional</div>
+                                        </li>
+                                        <li class="level-3">
+                                            <div class="node">Efectos Calendario</div>
+                                            <ul>
+                                                <li>
+                                                    <div class="node">Días Laborables</div>
+                                                </li>
+                                                <li>
+                                                    <div class="node">Semana Santa</div>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li class="level-3">
+                                            <div class="node">Ciclo-Tendencia</div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="level-1" id="node-v">
+                            <div class="node">V. Infraestructura</div>
+                            <ul>
+                                <li class="level-2">
+                                    <div class="connector-text" style="top:-10px"><span>estructura</span></div>
+                                    <div class="node">Fuentes</div>
+                                    <ul>
+                                        <li class="level-3">
+                                            <div class="node">INEGI / BANXICO</div>
+                                        </li>
+                                        <li class="level-3">
+                                            <div class="node">SHCP</div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="level-2">
+                                    <div class="node">Clasificaciones (SCIAN)</div>
+                                </li>
+                                <li class="level-2">
+                                    <div class="node">Calendario de Difusión</div>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script>
+        const viewport = document.getElementById('viewport');
+        const mapContainer = document.getElementById('map-container');
+
+        let scale = 0.9;
+        let panning = false;
+        let pointX = 0;
+        let pointY = 0;
+        let startX = 0;
+        let startY = 0;
+
+        // Centrado inicial
+        setTimeout(() => {
+            const vW = viewport.offsetWidth;
+            const vH = viewport.offsetHeight;
+            // Ajuste básico
+            pointY = vH * 0.05;
+            updateTransform();
+        }, 100);
+
+        function scrollToNode(id) {
+            const node = document.getElementById(id);
+            if (!node) return;
+
+            // Reset scale for easier centering logic or keep current? Let's keep current.
+            // Calculate node position relative to map container
+            const rect = node.getBoundingClientRect();
+            const mapRect = mapContainer.getBoundingClientRect();
+
+            // Center of screen
+            const viewCenterX = window.innerWidth / 2;
+            const viewCenterY = window.innerHeight / 2;
+
+            // Difference needed to bring node center to view center
+            // Need to calculate in unscaled coordinates logic or just use delta
+
+            // Simple logic:
+            // Current Node Screen Pos: rect.x + rect.width/2
+            // Desired: viewCenterX
+            // Delta X = viewCenterX - (rect.x + rect.width/2)
+            // Apply this delta to pointX
+
+            const nodeCenterX = rect.left + rect.width / 2;
+            const nodeCenterY = rect.top + rect.height / 2;
+
+            const diffX = viewCenterX - nodeCenterX;
+            const diffY = viewCenterY - nodeCenterY;
+
+            pointX += diffX;
+            pointY += diffY;
+
+            // Optional: reset scale to 1 for readability
+            scale = 1;
+
+            updateTransform();
+        }
+
+        viewport.onwheel = function (e) {
+            e.preventDefault();
+            const delta = -e.deltaY;
+            (delta > 0) ? (scale *= 1.1) : (scale /= 1.1);
+            if (scale > 3) scale = 3; else if (scale < 0.2) scale = 0.2;
+            updateTransform();
+        }
+
+        viewport.onmousedown = function (e) {
+            e.preventDefault();
+            startX = e.clientX - pointX;
+            startY = e.clientY - pointY;
+            panning = true;
+            viewport.style.cursor = "grabbing";
+        }
+        document.onmouseup = function (e) { panning = false; viewport.style.cursor = "grab"; }
+        document.onmousemove = function (e) {
+            if (!panning) return;
+            e.preventDefault();
+            pointX = e.clientX - startX;
+            pointY = e.clientY - startY;
+            updateTransform();
+        }
+
+        function updateTransform() {
+            mapContainer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        }
+
+        function zoomIn() { scale *= 1.2; updateTransform(); }
+        function zoomOut() { scale /= 1.2; updateTransform(); }
+        function resetZoom() {
+            scale = 0.9; pointX = 0; pointY = 0;
+            updateTransform();
+        }
+    </script>
+</body>
+
+</html>

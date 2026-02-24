@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INGeólicos - Propuesta de Inversión</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <nav class="navigation">
+        <a href="#intro" class="active"></a>
+        <a href="#strategic-conclusions"></a>
+        <a href="#conclusions"></a>
+        <a href="#assertive-conclusions"></a>
+        <a href="#details"></a>
+        <a href="#bsc"></a>
+        <a href="#objective"></a>
+    </nav>
+
+    <main class="scroll-container">
+
+        <!-- Slide 1: Introducción (Pitch & Team) -->
+        <section id="intro" class="slide" data-index="0">
+            <div class="background-overlay"></div>
+            <div class="intro-grid">
+                <div class="intro-content">
+                    <div class="brand-badge animate-text">
+                        <svg class="helmet-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2,13a9,9,0,0,1,18,0v3a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2Z" fill="#eab308"
+                                stroke="none" />
+                            <path d="M12,4v-2M10,2h4" stroke="#eab308" stroke-width="2" stroke-linecap="round" />
+                            <path d="M2,16h20" stroke="#b45309" stroke-width="2" />
+                        </svg>
+                        INGeólicos • 2026
+                    </div>
+                    <h1 class="animate-text">El Futuro es Eólico</h1>
+                    <p class="mission-text animate-text">
+                        "Estamos empeñados en ofrecer la mayor satisfacción tanto a nuestros usuarios como a nuestros
+                        inversores, transformando corrientes de aire en valor sostenible."
+                    </p>
+
+                    <div class="team-section animate-text">
+                        <span class="team-label">Equipo de Proyecto:</span>
+                        <div class="team-names">
+                            <span class="member">Aldo</span>
+                            <span class="separator">•</span>
+                            <span class="member">David</span>
+                            <span class="separator">•</span>
+                            <span class="member">Sara</span>
+                        </div>
+                    </div>
+
+                    <div class="stats animate-text">
+                        <div class="stat-item">
+                            <span class="number">+18%</span>
+                            <span class="label">TIR Proyectada</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">$12B</span>
+                            <span class="label">Oportunidad</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Visual Decoration Side -->
+                <div class="intro-visuals animate-visual">
+                    <div class="image-card card-1"></div>
+                    <div class="image-card card-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide NEW: Conclusiones Estratégicas (Recuperación & Reputación) -->
+        <section id="strategic-conclusions" class="slide" data-index="1">
+            <div class="content full-width">
+                <div class="strategic-layout">
+                    <div class="strategic-text">
+                        <h2 class="animate-text">Visión Estratégica</h2>
+                        <div class="key-point animate-text">
+                            <span class="big-number">15</span>
+                            <span class="unit">MW</span>
+                            <h4>Potencia Descomunal</h4>
+                            <p>Una sola de nuestras turbinas es capaz de abastecer a <strong>15,000 hogares</strong>.
+                                Menos infraestructura, mayor impacto.</p>
+                        </div>
+                        <div class="key-point animate-text">
+                            <span class="icon-point">🏆</span>
+                            <h4>Reputación Global</h4>
+                            <p>Posicionamiento inmediato en el Top Tier de índices ESG, atrayendo capital institucional
+                                verde.</p>
+                        </div>
+                        <div class="key-point animate-text">
+                            <span class="icon-point">🚀</span>
+                            <h4>Pioneros del Cambio</h4>
+                            <p>Ventaja de "First-Mover" en territorios inexplorados, asegurando los mejores recursos
+                                eólicos antes que la competencia.</p>
+                        </div>
+                    </div>
+                    <div class="strategic-visuals animate-visual">
+                        <div class="gallery-grid">
+                            <div class="g-item img-1"></div>
+                            <div class="g-item img-2"></div>
+                            <div class="g-item img-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Conclusiones (Market Opportunity) - MOVED -->
+        <section id="conclusions" class="slide" data-index="2">
+            <div class="content full-width">
+                <h2 class="animate-text">Por qué invertir ahora</h2>
+                <div class="dashboard-grid">
+                    <div class="card glass animate-card text-card">
+                        <h3>Rentabilidad Sostenida</h3>
+                        <p>El costo nivelado de energía (LCOE) ha caído un 60% en la última década, maximizando
+                            márgenes.</p>
+                        <h3 class="mt-4">Impacto ESG</h3>
+                        <p>Cumplimiento inmediato de metas de descarbonización corporativa y gubernamental.</p>
+                    </div>
+                    <div class="card glass animate-card chart-card">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide NEW: Conclusiones Asertivas - MOVED -->
+        <section id="assertive-conclusions" class="slide" data-index="3">
+            <div class="content central">
+                <h2 class="animate-text">Realidades del Sector</h2>
+                <div class="assertive-grid">
+                    <div class="assertive-item animate-card">
+                        <div class="icon">⚡</div>
+                        <h3>Seguridad Energética</h3>
+                        <p>La independencia de combustibles importados blinda la economía nacional ante volatilidad
+                            geopolítica.</p>
+                    </div>
+                    <div class="assertive-item animate-card">
+                        <div class="icon">📉</div>
+                        <h3>Desacople de Precios</h3>
+                        <p>Al no depender de insumos variables, la energía eólica ofrece tarifas predecibles y estables
+                            a 20 años.</p>
+                    </div>
+                    <div class="assertive-item animate-card">
+                        <div class="icon">🌍</div>
+                        <h3>Licencia Social</h3>
+                        <p>Los proyectos modernos integran a las comunidades, generando valor compartido y reduciendo
+                            conflictividad.</p>
+                    </div>
+                    <div class="assertive-item animate-card">
+                        <div class="icon">🌿</div>
+                        <h3>Tendencia Global</h3>
+                        <p>La consciencia ambiental es imparable. La sociedad exige activamente energías limpias,
+                            premiando a las empresas responsables.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Detalles y Desarrollo (Tech Specs) - MOVED -->
+        <section id="details" class="slide" data-index="4">
+            <div class="split-layout">
+                <div class="text-content">
+                    <h2 class="animate-text">Tecnología de Vanguardia</h2>
+                    <ul class="clean-list animate-text">
+                        <li><strong>Alcance Monumental:</strong> Aspas del tamaño de 2 canchas de fútbol para capturar
+                            vientos constantes a mayor altura.</li>
+                        <li><strong>Corazón Magnético:</strong> Motor sin fricción ni engranajes. Menos piezas que se
+                            rompan = 25 años de vida útil.</li>
+                        <li><strong>Estabilidad Inteligente:</strong> Tecnología que no solo genera, sino que protege la
+                            red eléctrica contra apagones.</li>
+                        <li><strong>Escalabilidad:</strong> Diseño modular adaptable a onshore/offshore.</li>
+                    </ul>
+                    <div class="mini-chart-container animate-text">
+                        <canvas id="efficiencyChart"></canvas>
+                    </div>
+                </div>
+                <!-- SVG Animation placeholder if image fails -->
+                <div class="visual-content animate-visual">
+                    <div class="turbine-graphic">
+                        <svg viewBox="0 0 100 100" class="turbine-svg">
+                            <rect x="48" y="40" width="4" height="60" fill="#ddd" />
+                            <circle cx="50" cy="40" r="2" fill="#333" />
+                            <g class="blades">
+                                <path d="M50 40 L50 10 Q55 25 50 40" fill="#fff" stroke="#ccc" stroke-width="0.5" />
+                                <path d="M50 40 L80 55 Q65 60 50 40" fill="#fff" stroke="#ccc" stroke-width="0.5" />
+                                <path d="M50 40 L20 55 Q35 60 50 40" fill="#fff" stroke="#ccc" stroke-width="0.5" />
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Balance Score Card - MOVED -->
+        <section id="bsc" class="slide" data-index="5">
+            <div class="content full-width">
+                <h2>Balance Score Card</h2>
+                <div class="bsc-grid">
+                    <!-- Finanzas -->
+                    <div class="bsc-card finanzas animate-bsc" data-type="financial">
+                        <div class="bsc-header">Finanzas</div>
+                        <div class="bsc-body">
+                            <p><strong>KPI:</strong> Inversión vs Proyectada</p>
+                            <div class="kpi-bar-container">
+                                <div class="kpi-bar" style="width: 85%; background: #10b981;"></div>
+                            </div>
+                            <p class="small">Iniciativa: Inversión Mixta (54% Estado)</p>
+                        </div>
+                    </div>
+
+                    <!-- Clientes -->
+                    <div class="bsc-card clientes animate-bsc" data-type="customer">
+                        <div class="bsc-header">Clientes</div>
+                        <div class="bsc-body">
+                            <p><strong>KPI:</strong> Cuello de botella (5.3%)</p>
+                            <div class="kpi-bar-container">
+                                <div class="kpi-bar" style="width: 5.3%; background: #3b82f6;"></div>
+                            </div>
+                            <p class="small">Iniciativa: Ventanilla Única Digital</p>
+                        </div>
+                    </div>
+
+                    <!-- Procesos -->
+                    <div class="bsc-card procesos animate-bsc" data-type="processes">
+                        <div class="bsc-header">Procesos Internos</div>
+                        <div class="bsc-body">
+                            <p><strong>KPI:</strong> Agilidad Permisos (+11%)</p>
+                            <div class="kpi-bar-container">
+                                <div class="kpi-bar" style="width: 65%; background: #f59e0b;"></div>
+                            </div>
+                            <p class="small">Iniciativa: Fast-Track Energético</p>
+                        </div>
+                    </div>
+
+                    <!-- Aprendizaje -->
+                    <div class="bsc-card aprendizaje animate-bsc" data-type="learning">
+                        <div class="bsc-header">Aprendizaje</div>
+                        <div class="bsc-body">
+                            <p><strong>KPI:</strong> Mitigación CO2 (25.1%)</p>
+                            <div class="kpi-bar-container">
+                                <div class="kpi-bar" style="width: 25.1%; background: #8b5cf6;"></div>
+                            </div>
+                            <p class="small">Iniciativa: Capacitación CleanTech</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Valor Agregado Final -->
+        <section id="objective" class="slide" data-index="6">
+            <div class="content central full-width">
+                <h2 class="animate-text">Nuestro Valor Diferencial</h2>
+                <div class="values-grid">
+                    <div class="value-card animate-zoom">
+                        <div class="v-icon">🤖</div>
+                        <h3>IA Predictiva</h3>
+                        <p>Algoritmos propios reducen costos de mantenimiento (O&M) un 30%.</p>
+                    </div>
+                    <div class="value-card animate-zoom">
+                        <div class="v-icon">📜</div>
+                        <h3>Bonos Verdes</h3>
+                        <p>Elegibilidad inmediata para financiamiento climático internacional (tasas <4%).< /p>
+                    </div>
+                    <div class="value-card animate-zoom">
+                        <div class="v-icon">🤝</div>
+                        <h3>Alianza Triple</h3>
+                        <p>Modelo único de cooperación: Gobierno (Regulación) + Privados (Capital) + Academia (I+D).</p>
+                    </div>
+                </div>
+                <div class="final-cta animate-text">
+                    <p>INGeólicos 2026 • Transformando el horizonte</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Detailed Modal -->
+    <div class="modal-overlay" id="kpiModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <div class="modal-header">
+                <span class="subtitle" id="modalSubtitle">Perspectiva Financiera</span>
+                <h2 id="modalTitle">Retorno de Inversión</h2>
+            </div>
+            <div class="modal-grid">
+                <div class="modal-left">
+                    <div class="modal-section">
+                        <h4>Fórmula de Cálculo</h4>
+                        <div class="calculation-box" id="modalCalc">
+                            ROI = (Beneficio Neto / Inversión Total) x 100
+                        </div>
+                    </div>
+                    <div class="modal-section">
+                        <h4>Función del KPI</h4>
+                        <p id="modalFunction">Mide la rentabilidad del proyecto eólico para asegurar la viabilidad
+                            económica a largo plazo y la atracción de capital privado.</p>
+                    </div>
+                    <div class="modal-section">
+                        <h4>Iniciativa Estratégica</h4>
+                        <p id="modalInitiative">Implementación de esquema mixto de inversión 54/46 para reducir
+                            exposición al riesgo estatal.</p>
+                    </div>
+                </div>
+                <div class="modal-right">
+                    <div class="modal-section">
+                        <h4>Proyección de Datos</h4>
+                        <div class="modal-chart-container">
+                            <canvas id="modalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
