@@ -6,12 +6,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INGeólicos - Propuesta de Inversión</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* --- TOP NAV BAR --- */
+        #top-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 24px;
+            background: rgba(15, 15, 30, 0.75);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        #top-navbar .brand {
+            font-size: 13px;
+            font-weight: 700;
+            color: #eab308;
+            letter-spacing: 1px;
+            margin-right: 12px;
+            text-transform: uppercase;
+        }
+
+        #top-navbar a {
+            text-decoration: none;
+            color: #bbb;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: all 0.25s;
+            border: 1px solid transparent;
+        }
+
+        #top-navbar a:hover {
+            color: #fff;
+            background: rgba(117, 101, 214, 0.25);
+            border-color: rgba(117, 101, 214, 0.5);
+        }
+
+        #top-navbar a.active-tab {
+            color: #fff;
+            background: rgba(117, 101, 214, 0.4);
+            border-color: rgba(117, 101, 214, 0.7);
+        }
+
+        body {
+            padding-top: 50px;
+        }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
+
+    <!-- TOP NAV BAR -->
+    <div id="top-navbar">
+        <span class="brand">⚡ INGeólicos</span>
+        <a href="index.html" class="active-tab">🖥️ Presentación</a>
+        <a href="MapaConceptual_Indicadores.html">🗺️ Mapa Conceptual</a>
+    </div>
 
     <nav class="navigation">
         <a href="#intro" class="active"></a>
