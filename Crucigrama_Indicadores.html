@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crucigrama: Indicadores Económicos</title>
+    <meta name="description" content="Crucigrama interactivo sobre indicadores económicos y estadísticos.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- TOP NAV BAR --- */
+        #top-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 24px;
+            background: rgba(15, 15, 30, 0.75);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        #top-navbar .brand {
+            font-size: 13px;
+            font-weight: 700;
+            color: #eab308;
+            letter-spacing: 1px;
+            margin-right: 12px;
+            text-transform: uppercase;
+        }
+
+        #top-navbar a {
+            text-decoration: none;
+            color: #bbb;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: all 0.25s;
+            border: 1px solid transparent;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #top-navbar a:hover {
+            color: #fff;
+            background: rgba(117, 101, 214, 0.25);
+            border-color: rgba(117, 101, 214, 0.5);
+        }
+
+        #top-navbar a.active-tab {
+            color: #fff;
+            background: rgba(117, 101, 214, 0.4);
+            border-color: rgba(117, 101, 214, 0.7);
+        }
+
+        /* --- GENERAL --- */
+        :root {
+            --bg-color: #0f0f1a;
+            --card-bg: #1a1a2e;
+            --card-border: rgba(255, 255, 255, 0.06);
+            --text-color: #f1f1f1;
+            --color-purple: #7565D6;
+            --color-pink: #D6658E;
+            --color-teal: #65D6AD;
+            --color-lime: #C7D665;
+            --color-gold: #eab308;
+            --font-main: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            padding-top: 60px;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(117, 101, 214, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(214, 101, 142, 0.06) 0%, transparent 50%),
+                radial-gradient(#1a1a2e 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 20px 20px;
+        }
+
+        /* --- HERO HEADER --- */
+        .hero {
+            text-align: center;
+            padding: 40px 20px 20px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--color-purple), var(--color-pink), var(--color-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero p {
+            color: #888;
+            font-size: 14px;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .hero .badge {
+            display: inline-block;
+            background: rgba(117, 101, 214, 0.2);
+            border: 1px solid rgba(117, 101, 214, 0.4);
+            color: var(--color-purple);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* --- LAYOUT --- */
+        .main-layout {
+            display: flex;
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 20px 40px;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* --- CROSSWORD GRID --- */
+        .crossword-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #crossword-grid {
+            display: inline-grid;
+            gap: 3px;
+            padding: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .cell {
+            width: 42px;
+            height: 42px;
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .cell.empty {
+            background: transparent;
+        }
+
+        .cell.active {
+            background: rgba(30, 30, 50, 0.9);
+            border: 1.5px solid rgba(117, 101, 214, 0.3);
+            transition: all 0.2s;
+        }
+
+        .cell.active:hover {
+            border-color: rgba(117, 101, 214, 0.6);
+            box-shadow: 0 0 12px rgba(117, 101, 214, 0.2);
+        }
+
+        .cell.active.selected {
+            border-color: var(--color-purple) !important;
+            box-shadow: 0 0 16px rgba(117, 101, 214, 0.4);
+            background: rgba(117, 101, 214, 0.15);
+        }
+
+        .cell.active.highlighted {
+            border-color: rgba(117, 101, 214, 0.5);
+            background: rgba(117, 101, 214, 0.08);
+        }
+
+        .cell.active.correct {
+            border-color: var(--color-teal) !important;
+            background: rgba(101, 214, 173, 0.15) !important;
+        }
+
+        .cell.active.correct input {
+            color: var(--color-teal) !important;
+        }
+
+        .cell-number {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--color-gold);
+            z-index: 2;
+            pointer-events: none;
+            line-height: 1;
+        }
+
+        .cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--font-main);
+            text-transform: uppercase;
+            caret-color: var(--color-pink);
+            outline: none;
+        }
+
+        .cell input::selection {
+            background: rgba(117, 101, 214, 0.4);
+        }
+
+        /* --- CLUES PANEL --- */
+        .clues-panel {
+            width: 340px;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .clues-panel {
+                width: 100%;
+                max-width: 500px;
+            }
+        }
+
+        .clues-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .clues-section h2 {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clues-section h2 .icon-h {
+            color: var(--color-pink);
+        }
+
+        .clues-section h2 .icon-v {
+            color: var(--color-teal);
+        }
+
+        .clue-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            align-items: flex-start;
+        }
+
+        .clue-item:hover {
+            background: rgba(117, 101, 214, 0.12);
+        }
+
+        .clue-item.active-clue {
+            background: rgba(117, 101, 214, 0.2);
+            border-left: 3px solid var(--color-purple);
+        }
+
+        .clue-item.solved-clue {
+            opacity: 0.5;
+        }
+
+        .clue-item.solved-clue .clue-num {
+            background: var(--color-teal);
+            color: #0f2c25;
+        }
+
+        .clue-num {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--color-gold);
+            font-size: 11px;
+            font-weight: 800;
+            min-width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .clue-text {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        /* --- SCOREBOARD --- */
+        .scoreboard {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .scoreboard .score-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #888;
+            font-weight: 700;
+        }
+
+        .scoreboard .score-value {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--color-gold), #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .scoreboard .score-detail {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .btn-check {
+            margin-top: 14px;
+            padding: 10px 28px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--color-purple), #5b4db8);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-main);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(117, 101, 214, 0.4);
+        }
+
+        .btn-check:active {
+            transform: translateY(0);
+        }
+
+        .btn-reveal {
+            margin-top: 8px;
+            padding: 8px 20px;
+            border: 1px solid rgba(214, 101, 142, 0.4);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--color-pink);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-main);
+        }
+
+        .btn-reveal:hover {
+            background: rgba(214, 101, 142, 0.1);
+        }
+
+        /* --- WIN OVERLAY --- */
+        #win-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(15, 15, 26, 0.92);
+            backdrop-filter: blur(16px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 16px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        #win-overlay.show {
+            display: flex;
+        }
+
+        #win-overlay h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--color-gold), #f59e0b, var(--color-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 1.5s ease infinite;
+        }
+
+        #win-overlay p {
+            color: #aaa;
+            font-size: 16px;
+        }
+
+        #win-overlay button {
+            margin-top: 10px;
+            padding: 12px 32px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--color-teal), #4db892);
+            color: #0f2c25;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-main);
+        }
+
+        #win-overlay button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(101, 214, 173, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.03);
+            }
+        }
+
+        /* Confetti canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10001;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP NAV BAR -->
+    <div id="top-navbar">
+        <span class="brand">⚡ INGeólicos</span>
+        <a href="index.html">🖥️ Presentación</a>
+        <a href="MapaConceptual_Indicadores.html">🗺️ Mapa Conceptual</a>
+        <a href="Crucigrama_Indicadores.html" class="active-tab">🧩 Crucigrama</a>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="badge"><i class="fa-solid fa-puzzle-piece"></i> &nbsp;Actividad Interactiva</div>
+        <h1>Crucigrama de Indicadores</h1>
+        <p>Pon a prueba tus conocimientos sobre los conceptos estadísticos y económicos del mapa conceptual.</p>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="main-layout">
+        <!-- CROSSWORD -->
+        <div class="crossword-panel">
+            <div id="crossword-grid"></div>
+        </div>
+
+        <!-- CLUES + SCORE -->
+        <div class="clues-panel">
+            <div class="scoreboard" id="scoreboard">
+                <div class="score-label">Progreso</div>
+                <div class="score-value" id="score-value">0%</div>
+                <div class="score-detail" id="score-detail">0 de 10 palabras</div>
+                <button class="btn-check" onclick="checkAnswers()"><i class="fa-solid fa-check-circle"></i>
+                    &nbsp;Verificar</button>
+                <br>
+                <button class="btn-reveal" onclick="revealAll()"><i class="fa-solid fa-eye"></i> &nbsp;Revelar
+                    todo</button>
+            </div>
+
+            <div class="clues-section" id="clues-horizontal">
+                <h2><i class="fa-solid fa-arrow-right icon-h"></i> Horizontales</h2>
+            </div>
+
+            <div class="clues-section" id="clues-vertical">
+                <h2><i class="fa-solid fa-arrow-down icon-v"></i> Verticales</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- WIN OVERLAY -->
+    <div id="win-overlay">
+        <h2>🎉 ¡Felicidades!</h2>
+        <p>Has completado el crucigrama correctamente.</p>
+        <button onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> &nbsp;Jugar de nuevo</button>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        // ========================================
+        // CROSSWORD DATA
+        // ========================================
+        // Grid: 16 cols x 15 rows
+        // Words placed manually to interlock nicely.
+        //
+        // WORDS (from concept map, NO Mexico-specific):
+        // 1. DEFLACTACION  (12 letters)
+        // 2. PONDERACION   (11 letters)
+        // 3. ACERVOS       (7 letters)
+        // 4. FLUJOS        (6 letters)
+        // 5. ESTACIONALIDAD (14 letters)
+        // 6. TENDENCIA     (9 letters)
+        // 7. NOMINAL       (7 letters)
+        // 8. ACUMULADA     (9 letters)
+        // 9. TASAANUAL     (9 letters)  → shown as "TASA ANUAL" in clue
+        // 10. REAL          (4 letters)
+
+        const GRID_COLS = 16;
+        const GRID_ROWS = 14;
+
+        // Each word: { word, clue, row, col, dir: 'H'|'V', number }
+        const words = [
+            {
+                word: "DEFLACTACION",
+                clue: "Proceso para convertir valores nominales a valores reales eliminando el efecto de los precios.",
+                row: 0, col: 1, dir: 'H', number: 1
+            },
+            {
+                word: "PONDERACION",
+                clue: "Peso relativo que se asigna a cada componente dentro de un número índice.",
+                row: 2, col: 5, dir: 'H', number: 2
+            },
+            {
+                word: "ACERVOS",
+                clue: "Variables que se miden en un momento específico del tiempo (también llamadas stocks).",
+                row: 4, col: 0, dir: 'H', number: 3
+            },
+            {
+                word: "FLUJOS",
+                clue: "Variables que se miden a lo largo de un intervalo de tiempo.",
+                row: 6, col: 0, dir: 'H', number: 4
+            },
+            {
+                word: "ESTACIONALIDAD",
+                clue: "Patrón repetitivo y predecible que se presenta en una serie de tiempo en determinados periodos.",
+                row: 8, col: 0, dir: 'H', number: 5
+            },
+            {
+                word: "TENDENCIA",
+                clue: "Componente de una serie de tiempo que refleja la dirección a largo plazo (ciclo-tendencia).",
+                row: 10, col: 3, dir: 'H', number: 6
+            },
+            {
+                word: "ACUMULADA",
+                clue: "Tipo de variación que mide el cambio desde el inicio del año hasta el periodo actual.",
+                row: 12, col: 3, dir: 'H', number: 7
+            },
+            {
+                word: "NOMINAL",
+                clue: "Tipo de valor expresado a precios corrientes, sin ajuste por inflación.",
+                row: 0, col: 5, dir: 'V', number: 8
+            },
+            {
+                word: "TASAANUAL",
+                clue: "Indicador que mide la variación porcentual respecto al mismo periodo del año anterior.",
+                row: 2, col: 9, dir: 'V', number: 9
+            },
+            {
+                word: "REAL",
+                clue: "Tipo de valor expresado a precios constantes, ya ajustado por inflación.",
+                row: 4, col: 3, dir: 'V', number: 10
+            },
+        ];
+
+        // Build grid
+        // grid[row][col] = { letter, wordIndices[], number? }
+        const grid = [];
+        for (let r = 0; r < GRID_ROWS; r++) {
+            grid[r] = [];
+            for (let c = 0; c < GRID_COLS; c++) {
+                grid[r][c] = { letter: null, wordIndices: [], number: null };
+            }
+        }
+
+        // Place words
+        words.forEach((w, idx) => {
+            for (let i = 0; i < w.word.length; i++) {
+                const r = w.dir === 'H' ? w.row : w.row + i;
+                const c = w.dir === 'H' ? w.col + i : w.col;
+                grid[r][c].letter = w.word[i];
+                grid[r][c].wordIndices.push(idx);
+                if (i === 0) {
+                    grid[r][c].number = w.number;
+                }
+            }
+        });
+
+        // ========================================
+        // RENDER GRID
+        // ========================================
+        const gridEl = document.getElementById('crossword-grid');
+        gridEl.style.gridTemplateColumns = `repeat(${GRID_COLS}, 42px)`;
+
+        const cellInputs = {}; // key "r-c" => input element
+
+        for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < GRID_COLS; c++) {
+                const cellDiv = document.createElement('div');
+                cellDiv.classList.add('cell');
+                cellDiv.dataset.row = r;
+                cellDiv.dataset.col = c;
+
+                if (grid[r][c].letter) {
+                    cellDiv.classList.add('active');
+
+                    if (grid[r][c].number !== null) {
+                        const numSpan = document.createElement('span');
+                        numSpan.classList.add('cell-number');
+                        numSpan.textContent = grid[r][c].number;
+                        cellDiv.appendChild(numSpan);
+                    }
+
+                    const input = document.createElement('input');
+                    input.maxLength = 1;
+                    input.dataset.row = r;
+                    input.dataset.col = c;
+                    input.setAttribute('autocomplete', 'off');
+                    input.setAttribute('spellcheck', 'false');
+                    input.addEventListener('focus', onCellFocus);
+                    input.addEventListener('input', onCellInput);
+                    input.addEventListener('keydown', onCellKeydown);
+                    cellDiv.appendChild(input);
+
+                    cellInputs[`${r}-${c}`] = input;
+                } else {
+                    cellDiv.classList.add('empty');
+                }
+
+                gridEl.appendChild(cellDiv);
+            }
+        }
+
+        // ========================================
+        // RENDER CLUES
+        // ========================================
+        const hCluesEl = document.getElementById('clues-horizontal');
+        const vCluesEl = document.getElementById('clues-vertical');
+
+        words.forEach((w, idx) => {
+            const item = document.createElement('div');
+            item.classList.add('clue-item');
+            item.id = `clue-${idx}`;
+            item.innerHTML = `<span class="clue-num">${w.number}</span><span class="clue-text">${w.clue}</span>`;
+            item.addEventListener('click', () => focusWord(idx));
+
+            if (w.dir === 'H') {
+                hCluesEl.appendChild(item);
+            } else {
+                vCluesEl.appendChild(item);
+            }
+        });
+
+        // ========================================
+        // INTERACTION LOGIC
+        // ========================================
+        let currentWordIdx = null;
+        let currentDir = 'H';
+
+        function onCellFocus(e) {
+            const r = parseInt(e.target.dataset.row);
+            const c = parseInt(e.target.dataset.col);
+            const cell = grid[r][c];
+
+            // Pick a word to highlight
+            if (cell.wordIndices.length === 1) {
+                highlightWord(cell.wordIndices[0]);
+            } else if (cell.wordIndices.length > 1) {
+                // Toggle between words on repeated click
+                if (currentWordIdx !== null && cell.wordIndices.includes(currentWordIdx)) {
+                    const otherIdx = cell.wordIndices.find(i => i !== currentWordIdx);
+                    if (otherIdx !== undefined) {
+                        highlightWord(otherIdx);
+                    }
+                } else {
+                    highlightWord(cell.wordIndices[0]);
+                }
+            }
+        }
+
+        function highlightWord(wordIdx) {
+            currentWordIdx = wordIdx;
+            const w = words[wordIdx];
+            currentDir = w.dir;
+
+            // Clear all highlights
+            document.querySelectorAll('.cell.active').forEach(c => {
+                c.classList.remove('selected', 'highlighted');
+            });
+            document.querySelectorAll('.clue-item').forEach(c => c.classList.remove('active-clue'));
+
+            // Highlight word cells
+            for (let i = 0; i < w.word.length; i++) {
+                const rr = w.dir === 'H' ? w.row : w.row + i;
+                const cc = w.dir === 'H' ? w.col + i : w.col;
+                const key = `${rr}-${cc}`;
+                const input = cellInputs[key];
+                if (input) {
+                    input.parentElement.classList.add('highlighted');
+                }
+            }
+
+            // Highlight active clue
+            const clueEl = document.getElementById(`clue-${wordIdx}`);
+            if (clueEl) {
+                clueEl.classList.add('active-clue');
+                clueEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function focusWord(wordIdx) {
+            const w = words[wordIdx];
+            const key = `${w.row}-${w.col}`;
+            const input = cellInputs[key];
+            if (input) {
+                input.focus();
+                highlightWord(wordIdx);
+            }
+        }
+
+        function onCellInput(e) {
+            const val = e.target.value.toUpperCase().replace(/[^A-ZÑ]/g, '');
+            e.target.value = val;
+            if (val) {
+                moveToNext(parseInt(e.target.dataset.row), parseInt(e.target.dataset.col));
+            }
+        }
+
+        function onCellKeydown(e) {
+            const r = parseInt(e.target.dataset.row);
+            const c = parseInt(e.target.dataset.col);
+
+            if (e.key === 'Backspace' && !e.target.value) {
+                e.preventDefault();
+                moveToPrev(r, c);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                moveTo(r, c + 1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                moveTo(r, c - 1);
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                moveTo(r + 1, c);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                moveTo(r - 1, c);
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                // Move to next word
+                if (currentWordIdx !== null) {
+                    const nextIdx = (currentWordIdx + 1) % words.length;
+                    focusWord(nextIdx);
+                }
+            }
+        }
+
+        function moveToNext(r, c) {
+            if (currentDir === 'H') moveTo(r, c + 1);
+            else moveTo(r + 1, c);
+        }
+
+        function moveToPrev(r, c) {
+            if (currentDir === 'H') moveTo(r, c - 1);
+            else moveTo(r - 1, c);
+        }
+
+        function moveTo(r, c) {
+            const key = `${r}-${c}`;
+            if (cellInputs[key]) {
+                cellInputs[key].focus();
+            }
+        }
+
+        // ========================================
+        // CHECK & SCORE
+        // ========================================
+        function checkAnswers() {
+            let solvedCount = 0;
+
+            words.forEach((w, idx) => {
+                let correct = true;
+                for (let i = 0; i < w.word.length; i++) {
+                    const rr = w.dir === 'H' ? w.row : w.row + i;
+                    const cc = w.dir === 'H' ? w.col + i : w.col;
+                    const key = `${rr}-${cc}`;
+                    const input = cellInputs[key];
+                    const userVal = input ? input.value.toUpperCase() : '';
+                    if (userVal !== w.word[i]) {
+                        correct = false;
+                    }
+                }
+
+                if (correct) {
+                    solvedCount++;
+                    // Mark cells as correct
+                    for (let i = 0; i < w.word.length; i++) {
+                        const rr = w.dir === 'H' ? w.row : w.row + i;
+                        const cc = w.dir === 'H' ? w.col + i : w.col;
+                        const key = `${rr}-${cc}`;
+                        const input = cellInputs[key];
+                        if (input) {
+                            input.parentElement.classList.add('correct');
+                            input.readOnly = true;
+                        }
+                    }
+                    // Mark clue as solved
+                    const clueEl = document.getElementById(`clue-${idx}`);
+                    if (clueEl) clueEl.classList.add('solved-clue');
+                }
+            });
+
+            const pct = Math.round((solvedCount / words.length) * 100);
+            document.getElementById('score-value').textContent = pct + '%';
+            document.getElementById('score-detail').textContent = `${solvedCount} de ${words.length} palabras`;
+
+            if (solvedCount === words.length) {
+                showWin();
+            }
+        }
+
+        function revealAll() {
+            words.forEach((w, idx) => {
+                for (let i = 0; i < w.word.length; i++) {
+                    const rr = w.dir === 'H' ? w.row : w.row + i;
+                    const cc = w.dir === 'H' ? w.col + i : w.col;
+                    const key = `${rr}-${cc}`;
+                    const input = cellInputs[key];
+                    if (input) {
+                        input.value = w.word[i];
+                        input.parentElement.classList.add('correct');
+                        input.readOnly = true;
+                    }
+                }
+                const clueEl = document.getElementById(`clue-${idx}`);
+                if (clueEl) clueEl.classList.add('solved-clue');
+            });
+
+            document.getElementById('score-value').textContent = '100%';
+            document.getElementById('score-detail').textContent = `${words.length} de ${words.length} palabras`;
+        }
+
+        // ========================================
+        // WIN SCREEN + CONFETTI
+        // ========================================
+        function showWin() {
+            document.getElementById('win-overlay').classList.add('show');
+            launchConfetti();
+        }
+
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const colors = ['#7565D6', '#D6658E', '#65D6AD', '#C7D665', '#eab308', '#f59e0b'];
+            const particles = [];
+
+            for (let i = 0; i < 200; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    w: Math.random() * 10 + 4,
+                    h: Math.random() * 6 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: Math.random() * 4 + 2,
+                    rot: Math.random() * 360,
+                    rotSpeed: (Math.random() - 0.5) * 10,
+                });
+            }
+
+            let frame = 0;
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.rot += p.rotSpeed;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rot * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore();
+                });
+                frame++;
+                if (frame < 300) requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+
+</html>
