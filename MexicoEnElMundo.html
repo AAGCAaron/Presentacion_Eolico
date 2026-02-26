@@ -4,35 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mexicanos en el Mundo – Indicadores Económicos</title>
-
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { outfit: ['Outfit', 'sans-serif'] },
-                    colors: {
-                        night: '#0d0d1a',
-                        card: '#13132a',
-                        border: '#1e1e3a',
-                        accent: '#e84c3d',
-                        gold: '#f59e0b',
-                        teal: '#14b8a6',
-                        purple: '#7c3aed',
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Capital Humano e Identidad Global – Mexicanos en el Mundo</title>
+    <meta name="description"
+        content="Presentación sobre el capital humano mexicano, la circulación de cerebros y la cultura como soft power en el escenario global.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #07081a;
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --accent: #e84c3d;
+            --gold: #f59e0b;
+            --teal: #14b8a6;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --pink: #ec4899;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --font: 'Outfit', sans-serif;
+        }
+
+        html {
+            font-size: 115%;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-deep);
+            color: var(--text);
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
         /* ── NAV BAR ── */
         #top-navbar {
             position: fixed;
@@ -44,17 +64,17 @@
             align-items: center;
             gap: 6px;
             padding: 10px 24px;
-            background: rgba(13, 13, 26, 0.80);
+            background: rgba(7, 8, 26, 0.82);
             backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-            font-family: 'Outfit', sans-serif;
+            box-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
         }
 
         #top-navbar .brand {
-            font-size: 13px;
+            font-size: 18px;
             font-weight: 700;
-            color: #f59e0b;
+            color: var(--gold);
             letter-spacing: 1px;
             margin-right: 12px;
             text-transform: uppercase;
@@ -63,9 +83,9 @@
         #top-navbar a {
             text-decoration: none;
             color: #9ca3af;
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 500;
-            padding: 6px 16px;
+            padding: 8px 18px;
             border-radius: 20px;
             transition: all 0.25s;
             border: 1px solid transparent;
@@ -83,14 +103,7 @@
             border-color: rgba(232, 76, 61, 0.6);
         }
 
-        /* ── SLIDES ── */
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: #0d0d1a;
-            color: #f1f1f1;
-            overflow: hidden;
-        }
-
+        /* ── SLIDE ENGINE ── */
         .slide-wrapper {
             position: fixed;
             top: 50px;
@@ -98,65 +111,73 @@
             right: 0;
             bottom: 0;
             overflow: hidden;
+            z-index: 1;
         }
 
         .slide {
             position: absolute;
             inset: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: 32px 32px 80px;
             opacity: 0;
-            transform: translateX(80px);
-            transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1), transform 0.5s cubic-bezier(.4, 0, .2, 1);
+            transform: translateX(80px) scale(0.97);
+            transition: opacity 0.55s cubic-bezier(.4, 0, .2, 1), transform 0.55s cubic-bezier(.4, 0, .2, 1);
             pointer-events: none;
         }
 
         .slide.active {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateX(0) scale(1);
             pointer-events: all;
         }
 
         .slide.exit-left {
             opacity: 0;
-            transform: translateX(-80px);
+            transform: translateX(-80px) scale(0.97);
         }
 
-        /* ── PROGRESS BAR ── */
+        .slide.exit-right {
+            opacity: 0;
+            transform: translateX(80px) scale(0.97);
+        }
+
+        /* ── PROGRESS ── */
         #progress-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             height: 3px;
-            background: #e84c3d;
+            background: linear-gradient(90deg, var(--accent), var(--gold));
             transition: width 0.45s ease;
             z-index: 9999;
+            border-radius: 0 3px 3px 0;
         }
 
         /* ── NAV BUTTONS ── */
         .nav-btn {
             position: fixed;
-            bottom: 28px;
+            bottom: 24px;
             z-index: 9999;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             color: #fff;
             padding: 10px 28px;
             border-radius: 30px;
-            font-family: 'Outfit', sans-serif;
+            font-family: var(--font);
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            backdrop-filter: blur(8px);
+            transition: all 0.25s;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .nav-btn:hover {
-            background: rgba(232, 76, 61, 0.3);
-            border-color: #e84c3d;
+            background: rgba(232, 76, 61, 0.25);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(232, 76, 61, 0.2);
         }
 
         #btn-prev {
@@ -169,53 +190,369 @@
             transform: translateX(20px);
         }
 
-        /* ── SLIDE COUNTER ── */
+        /* ── DOTS ── */
         #slide-counter {
             position: fixed;
-            bottom: 36px;
+            bottom: 64px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 12px;
-            color: #6b7280;
-            font-family: 'Outfit', sans-serif;
+            display: flex;
+            gap: 8px;
+            z-index: 9999;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.35s;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(232, 76, 61, 0.5);
+            transform: scale(1.25);
+        }
+
+        /* ── GLASS ── */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .glass:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.22);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        /* ── TYPOGRAPHY ── */
+        .tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+
+        .slide-title {
+            font-size: clamp(1.8rem, 4.5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 10px;
+        }
+
+        .slide-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .accent {
+            color: var(--accent);
+        }
+
+        .gold {
+            color: var(--gold);
+        }
+
+        .teal {
+            color: var(--teal);
+        }
+
+        .purple {
+            color: var(--purple);
+        }
+
+        .blue {
+            color: var(--blue);
+        }
+
+        .pink {
+            color: var(--pink);
+        }
+
+        .bold {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* ── PERSON CARD ── */
+        .person-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .person-card .photo {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .person-card .info {
+            padding: 18px 20px;
+        }
+
+        .person-card h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .person-card .role {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
             letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
         }
 
-        /* ── DATA CARDS ── */
-        .data-card {
-            background: #13132a;
-            border: 1px solid #1e1e3a;
+        /* ── VISUAL CARD (icon-based) ── */
+        .visual-card {
+            text-align: center;
+        }
+
+        .visual-card .photo {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .visual-card .info {
+            padding: 16px 18px;
+        }
+
+        .visual-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .visual-card .role {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        /* ── KEY MESSAGE ── */
+        .key-msg {
+            background: rgba(232, 76, 61, 0.08);
+            border: 1px solid rgba(232, 76, 61, 0.25);
             border-radius: 14px;
-            padding: 20px 24px;
-            transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+            padding: 14px 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 14px;
         }
 
-        .data-card:hover {
-            transform: translateY(-6px);
-            border-color: #7c3aed;
-            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.25);
+        .key-msg .icon {
+            font-size: 22px;
         }
 
-        /* ── BACKGROUND GRID ── */
-        .slide-wrapper {
-            background-image: radial-gradient(#1a1a35 1px, transparent 1px);
-            background-size: 28px 28px;
+        .key-msg p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
-        /* ── SLIDE 1: HERO ── */
-        .flag-stripe-green {
-            background: #006847;
+        /* ── GRIDS ── */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 860px;
         }
 
-        .flag-stripe-white {
-            background: #f1f1f1;
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            width: 100%;
+            max-width: 920px;
         }
 
-        .flag-stripe-red {
-            background: #ce1126;
+        /* ── QUOTE ── */
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(232, 76, 61, 0.12);
+            }
+
+            50% {
+                box-shadow: 0 0 35px rgba(232, 76, 61, 0.28);
+            }
         }
 
-        /* Animate in text */
+        .quote-box {
+            background: linear-gradient(135deg, rgba(232, 76, 61, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(232, 76, 61, 0.25);
+            border-radius: 16px;
+            padding: 22px 28px;
+            text-align: center;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        .quote-box blockquote {
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-style: italic;
+            color: #fff;
+        }
+
+        /* ── SOURCE LIST ── */
+        .source-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 780px;
+        }
+
+        .source-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 18px;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            transition: border-color 0.25s, transform 0.25s;
+        }
+
+        .source-item:hover {
+            border-color: var(--gold);
+            transform: translateX(6px);
+        }
+
+        .source-num {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--gold);
+        }
+
+        .source-item p {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        .source-item strong {
+            color: #fff;
+        }
+
+        /* ── HERO IMAGE ── */
+        .hero-img {
+            width: 100%;
+            max-width: 520px;
+            border-radius: 18px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ── NETWORK IMAGE ── */
+        .network-img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ── OLYMPIC TABLE ── */
+        .olympic-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .olympic-table thead th {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--gold);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .olympic-table tbody td {
+            padding: 12px 16px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            background: var(--glass-bg);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+        }
+
+        .olympic-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .olympic-table tbody tr:hover td {
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        .olympic-table .medal {
+            font-size: 1.1rem;
+        }
+
+        .olympic-table .athlete {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* ── BOXING IMAGE ── */
+        .boxing-img {
+            width: 100%;
+            max-width: 380px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.5);
+            object-fit: cover;
+        }
+
+        /* ── ANIM ── */
         @keyframes fadeUp {
             from {
                 opacity: 0;
@@ -228,393 +565,443 @@
             }
         }
 
+        .anim {
+            opacity: 0;
+        }
+
         .slide.active .anim {
-            animation: fadeUp 0.6s ease forwards;
+            animation: fadeUp 0.55s ease forwards;
         }
 
-        .slide.active .anim:nth-child(2) {
-            animation-delay: 0.15s;
-            opacity: 0;
+        .slide.active .anim.d1 {
+            animation-delay: 0.1s;
         }
 
-        .slide.active .anim:nth-child(3) {
-            animation-delay: 0.30s;
-            opacity: 0;
+        .slide.active .anim.d2 {
+            animation-delay: 0.2s;
         }
 
-        .slide.active .anim:nth-child(4) {
-            animation-delay: 0.45s;
-            opacity: 0;
+        .slide.active .anim.d3 {
+            animation-delay: 0.3s;
+        }
+
+        .slide.active .anim.d4 {
+            animation-delay: 0.4s;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .slide {
+                padding: 24px 16px 90px;
+            }
+
+            .slide-title {
+                font-size: 1.6rem;
+            }
+
+            #top-navbar {
+                flex-wrap: wrap;
+                gap: 4px;
+                padding: 8px 12px;
+            }
+
+            .hero-img {
+                max-width: 320px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- TOP NAV BAR -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- NAV BAR -->
     <div id="top-navbar">
-        <span class="brand">⚡ INGeólicos</span>
+        <span class="brand">⚡ Equipo 3 RyNM</span>
         <a href="index.html">🖥️ Presentación</a>
         <a href="MapaConceptual_Indicadores.html">🗺️ Mapa Conceptual</a>
         <a href="Crucigrama_Indicadores.html">🧩 Crucigrama</a>
         <a href="MexicoEnElMundo.html" class="active-tab">🌎 Presentación 3</a>
     </div>
 
-    <!-- SLIDES WRAPPER -->
+    <!-- ═══════ SLIDES ═══════ -->
     <div class="slide-wrapper">
 
-        <!-- ══ SLIDE 1: PORTADA ══ -->
+        <!-- ▸ SLIDE 1 — PORTADA ▸ -->
         <section class="slide active" id="slide-1">
-            <div class="flex flex-col items-center text-center max-w-3xl">
+            <div
+                style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:18px; max-width:800px;">
                 <!-- Mini bandera -->
-                <div class="flex mb-8 rounded-lg overflow-hidden shadow-2xl" style="height:8px; width:240px;">
-                    <div class="flex-1 flag-stripe-green"></div>
-                    <div class="flex-1 flag-stripe-white"></div>
-                    <div class="flex-1 flag-stripe-red"></div>
+                <div class="anim"
+                    style="display:flex; height:5px; width:180px; border-radius:5px; overflow:hidden; box-shadow:0 0 16px rgba(0,0,0,0.4);">
+                    <div style="flex:1; background:#006847;"></div>
+                    <div style="flex:1; background:#f1f1f1;"></div>
+                    <div style="flex:1; background:#ce1126;"></div>
                 </div>
-                <div class="anim text-sm font-semibold tracking-widest text-gold uppercase mb-3">Indicadores Económicos
-                    · 2026</div>
-                <h1 class="anim text-6xl font-extrabold leading-tight mb-4">
-                    Mexicanos<br><span class="text-accent">en el Mundo</span>
+                <div class="anim tag">Capital Humano e Identidad Global · 2026</div>
+                <h1 class="anim d1 slide-title">
+                    Mexicanos:<br><span class="accent">La raza de bronce</span>
                 </h1>
-                <p class="anim text-xl text-gray-400 max-w-xl mb-6">
-                    Un análisis a través de indicadores económicos y estadísticos.
-                </p>
-                <div
-                    class="anim inline-block border border-gray-700 rounded-2xl px-6 py-3 bg-card text-gray-400 text-sm">
-                    🔍 Aplicación de conceptos de <strong class="text-teal">flujos</strong>, <strong
-                        class="text-purple-400">acervos</strong> y <strong class="text-gold">tasas</strong> a la
-                    diáspora mexicana
+
+                <div class="anim d2"
+                    style="display:flex; gap:40px; align-items:center; justify-content:center; width:100%;">
+                    <!-- Mapa -->
+                    <img src="img/mexico_global_map.png" alt="Mapa global con conexiones desde México" class="hero-img"
+                        style="flex:1; max-width:480px;">
+
+                    <!-- QR Code -->
+                    <div
+                        style="background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:18px; padding:20px; display:flex; flex-direction:column; align-items:center; backdrop-filter:blur(12px);">
+                        <img src="img/QR_Presentacion.png" alt="QR de la Presentación"
+                            style="width:160px; height:160px; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+                        <span
+                            style="margin-top:14px; font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1px; text-align:center;">Accede
+                            a la<br><span class="accent">Presentación</span></span>
+                    </div>
                 </div>
-            </div>
         </section>
 
-        <!-- ══ SLIDE 2: ACERVOS VS FLUJOS ══ -->
+        <!-- ▸ SLIDE 2 — MENTEFACTURA ▸ -->
         <section class="slide" id="slide-2">
-            <div class="max-w-4xl w-full">
-                <div class="anim text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 2 · Marco Teórico</div>
-                <h2 class="anim text-4xl font-bold mb-8">Acervos <span class="text-gray-500">vs.</span> Flujos</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Acervo -->
-                    <div class="data-card anim">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-content-center"
-                                style="background:rgba(124,58,237,0.2); display:flex; align-items:center; justify-content:center;">
-                                <span class="text-xl">🏛️</span>
-                            </div>
-                            <span class="text-purple-400 font-bold text-lg">Acervo (Stock)</span>
-                        </div>
-                        <p class="text-gray-300 leading-relaxed">
-                            Representa el <strong class="text-white">total</strong> de mexicanos que residen fuera del
-                            país
-                            <strong class="text-purple-300"> en un momento dado</strong>.
-                        </p>
-                        <div class="mt-4 rounded-xl p-4 text-center"
-                            style="background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.3);">
-                            <span class="text-3xl font-extrabold text-purple-400">~12.3 M</span>
-                            <p class="text-xs text-gray-500 mt-1">mexicanos en el exterior (dato de corte)</p>
+            <div style="width:100%; max-width:920px; display:flex; flex-direction:column; align-items:center;">
+                <div class="anim tag" style="align-self:flex-start;">Slide 2 · Mentefactura</div>
+                <h2 class="anim d1 slide-title" style="align-self:flex-start;">De la Tierra <span class="teal">a
+                        Marte</span></h2>
+                <p class="anim d2 slide-subtitle" style="align-self:flex-start;">
+                    México: <span class="bold">líder latinoamericano</span> en exportación de alta tecnología. Ya no
+                    ensamblamos; <span class="teal">diseñamos</span>.
+                </p>
+
+                <div class="grid-2 anim d3">
+                    <!-- Luis Enrique Velasco -->
+                    <div class="glass person-card">
+                        <img src="img/luis_velasco.png" alt="Luis Enrique Velasco – Ingeniero NASA" class="photo">
+                        <div class="info">
+                            <h4>Luis Enrique Velasco</h4>
+                            <p class="role">Ingeniero <span class="blue">chiapaneco</span> · Diseñó las cámaras del
+                                rover <span class="bold">Perseverance</span></p>
+                            <span class="badge" style="background:rgba(59,130,246,0.15); color:var(--blue);">🚀 NASA ·
+                                JPL</span>
                         </div>
                     </div>
-                    <!-- Flujo -->
-                    <div class="data-card anim">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-full flex items-center"
-                                style="background:rgba(20,184,166,0.2); display:flex; align-items:center; justify-content:center;">
-                                <span class="text-xl">🔄</span>
-                            </div>
-                            <span class="text-teal font-bold text-lg">Flujo</span>
-                        </div>
-                        <p class="text-gray-300 leading-relaxed">
-                            Representa el <strong class="text-white">movimiento neto</strong> de personas que salen o
-                            regresan
-                            a México <strong class="text-teal">en un periodo determinado</strong> (un año).
-                        </p>
-                        <div class="mt-4 rounded-xl p-4 text-center"
-                            style="background:rgba(20,184,166,0.1); border:1px solid rgba(20,184,166,0.3);">
-                            <span class="text-lg font-bold text-teal">Δ anual de entradas y salidas</span>
+
+                    <!-- Victoria de León -->
+                    <div class="glass person-card">
+                        <img src="img/victoria_deleon.png" alt="Victoria de León – Científica" class="photo">
+                        <div class="info">
+                            <h4>Victoria de León</h4>
+                            <p class="role">25 mujeres más influyentes en ciencia <span class="pink">(2025)</span> ·
+                                <span class="bold">Biomateriales espaciales</span>
+                            </p>
+                            <span class="badge" style="background:rgba(236,72,153,0.15); color:var(--pink);">🔬 Ciencia
+                                · 2025</span>
                         </div>
                     </div>
                 </div>
-                <!-- Nota -->
-                <div class="anim mt-6 rounded-xl p-4 flex gap-3 items-start"
-                    style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25);">
-                    <span class="text-gold text-lg mt-0.5">⚠️</span>
-                    <p class="text-gray-400 text-sm">
-                        <strong class="text-gold">Nota clave:</strong> No confundir el total acumulado (acervo) con el
-                        movimiento anual (flujo).
-                        Son medidas distintas que responden preguntas distintas.
-                    </p>
+
+                <div class="anim d4 key-msg" style="max-width:860px;">
+                    <span class="icon">💡</span>
+                    <p><strong class="gold">Necesitamos</strong> invertir en <span class="bold">patentes propias</span>
+                        — de la maquila a la <span class="teal">mentefactura</span>.</p>
                 </div>
             </div>
         </section>
 
-        <!-- ══ SLIDE 3: PONDERACIÓN GEOGRÁFICA ══ -->
+        <!-- ▸ SLIDE 3 — CIRCULACIÓN DE CEREBROS ▸ -->
         <section class="slide" id="slide-3">
-            <div class="max-w-4xl w-full">
-                <div class="text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 3 · Distribución</div>
-                <h2 class="text-4xl font-bold mb-2">Ponderación <span class="text-accent">Geográfica</span></h2>
-                <p class="text-gray-400 mb-6">El índice de distribución está <strong class="text-white">altamente
-                        concentrado</strong>.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <!-- Chart -->
-                    <div class="data-card flex items-center justify-center" style="height:280px;">
-                        <canvas id="diasporaChart"></canvas>
-                    </div>
-                    <!-- Stats -->
-                    <div class="flex flex-col gap-4">
-                        <div class="data-card">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-white">🇺🇸 Estados Unidos</span>
-                                <span class="text-2xl font-extrabold text-accent">97%</span>
+            <div style="width:100%; max-width:920px; display:flex; flex-direction:column; align-items:center;">
+                <div class="anim tag" style="align-self:flex-start;">Slide 3 · Red de Talentos</div>
+                <h2 class="anim d1 slide-title" style="align-self:flex-start;">Circulación de <span
+                        class="purple">Cerebros</span></h2>
+                <p class="anim d2 slide-subtitle" style="align-self:flex-start;">
+                    No es "fuga" — es una <span class="bold">red</span> que conecta a México con el mundo.
+                </p>
+
+                <div class="anim d3" style="display:flex; gap:24px; align-items:center; width:100%; max-width:860px;">
+                    <!-- Network Image -->
+                    <img src="img/brain_network.png" alt="Red global de talentos mexicanos" class="network-img"
+                        style="flex-shrink:0;">
+
+                    <!-- Info cards -->
+                    <div style="display:flex; flex-direction:column; gap:14px; flex:1;">
+                        <div class="glass" style="padding:18px 20px;">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+                                <span style="font-size:22px;">🌐</span>
+                                <h4 style="font-weight:700; font-size:1rem;">Red Global MX</h4>
                             </div>
-                            <div class="w-full rounded-full h-2" style="background:#1e1e3a;">
-                                <div class="h-2 rounded-full" style="width:97%; background:#e84c3d;"></div>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-2">Principal destino de la diáspora mexicana</p>
+                            <p style="font-size:0.84rem; color:var(--text-muted); line-height:1.5;">
+                                <span class="purple">50+ capítulos</span> en <span class="bold">27 países</span> ·
+                                Conecta al <span class="purple">CERN</span> con universidades mexicanas
+                            </p>
                         </div>
-                        <div class="data-card">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-white">🌐 Resto del Mundo</span>
-                                <span class="text-2xl font-extrabold text-teal">3%</span>
+                        <div class="glass" style="padding:18px 20px;">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+                                <span style="font-size:22px;">🤖</span>
+                                <h4 style="font-weight:700; font-size:1rem;">Nodos de Innovación</h4>
                             </div>
-                            <div class="w-full rounded-full h-2" style="background:#1e1e3a;">
-                                <div class="h-2 rounded-full" style="width:3%; background:#14b8a6;"></div>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-2">Canadá, España, Alemania y otros</p>
+                            <p style="font-size:0.84rem; color:var(--text-muted); line-height:1.5;">
+                                <span class="bold">Silvia Martínez</span> en <span class="teal">Japón</span> vincula
+                                estudiantes de robótica México ⇄ Japón
+                            </p>
+                        </div>
+                        <div class="key-msg"
+                            style="background:rgba(168,85,247,0.08); border-color:rgba(168,85,247,0.25);">
+                            <span class="icon">🌉</span>
+                            <p>El mexicano fuera es un <span class="bold">"puente"</span>, <span class="purple">no una
+                                    pérdida</span>.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ══ SLIDE 4: REMESAS NOMINAL VS REAL ══ -->
+        <!-- ▸ SLIDE 4 — SOFT POWER ▸ -->
         <section class="slide" id="slide-4">
-            <div class="max-w-4xl w-full">
-                <div class="text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 4 · Análisis Monetario</div>
-                <h2 class="text-4xl font-bold mb-2">Remesas – Valor <span class="text-gold">Nominal</span> vs. <span
-                        class="text-teal">Real</span></h2>
-                <p class="text-gray-400 mb-6">Las remesas son un <strong class="text-white">flujo de divisas
-                        vital</strong> para México.</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div class="data-card md:col-span-1 flex flex-col justify-center items-center text-center">
-                        <span class="text-4xl mb-3">💸</span>
-                        <span class="text-3xl font-extrabold text-gold">+10%</span>
-                        <p class="text-xs text-gray-400 mt-2">Incremento nominal de remesas</p>
-                    </div>
-                    <div class="data-card md:col-span-1 flex flex-col justify-center items-center text-center">
-                        <span class="text-4xl mb-3">📈</span>
-                        <span class="text-3xl font-extrabold text-accent">–8%</span>
-                        <p class="text-xs text-gray-400 mt-2">Inflación en México (pérdida de poder adquisitivo)</p>
-                    </div>
-                    <div class="data-card md:col-span-1 flex flex-col justify-center items-center text-center">
-                        <span class="text-4xl mb-3">💱</span>
-                        <span class="text-3xl font-extrabold text-purple-400">Apreciación</span>
-                        <p class="text-xs text-gray-400 mt-2">Del peso mexicano reduce el valor en MXN</p>
-                    </div>
-                    <!-- Resultado -->
-                    <div class="data-card md:col-span-3 mt-1">
-                        <div class="flex gap-4 items-center">
-                            <div class="text-4xl">⚖️</div>
-                            <div>
-                                <p class="text-white font-semibold mb-1">Resultado del Análisis:</p>
-                                <p class="text-gray-300 text-sm leading-relaxed">
-                                    Para entender el impacto verdadero, debemos <strong class="text-teal">deflactar el
-                                        monto nominal</strong>.
-                                    Si las remesas suben 10% pero la inflación es de 8% y el peso se aprecia,
-                                    el valor real (poder adquisitivo) para las familias mexicanas
-                                    <strong class="text-accent">puede incluso disminuir</strong>.
-                                </p>
-                            </div>
+            <div style="width:100%; max-width:940px; display:flex; flex-direction:column; align-items:center;">
+                <div class="anim tag" style="align-self:flex-start;">Slide 4 · Cultura como Soft Power</div>
+                <h2 class="anim d1 slide-title" style="align-self:flex-start;">Identidad <span class="gold">sin
+                        Fronteras</span></h2>
+
+                <div class="grid-3 anim d2">
+                    <!-- Elisa Carrillo -->
+                    <div class="glass visual-card">
+                        <img src="img/elisa_carrillo.png" alt="Elisa Carrillo – Ballet" class="photo">
+                        <div class="info">
+                            <h4>Elisa Carrillo</h4>
+                            <p class="role">Primera bailarina · <span class="gold">Ópera de Berlín</span></p>
+                            <span class="badge" style="background:rgba(245,158,11,0.15); color:var(--gold);">🇩🇪
+                                Berlín</span>
                         </div>
                     </div>
+
+                    <!-- Damián Ortega -->
+                    <div class="glass visual-card">
+                        <img src="img/damian_ortega.png" alt="Damián Ortega – Arte Visual" class="photo">
+                        <div class="info">
+                            <h4>Damián Ortega</h4>
+                            <p class="role">Arte visual · <span class="accent">Tate Modern</span>, Londres</p>
+                            <span class="badge" style="background:rgba(232,76,61,0.15); color:var(--accent);">🇬🇧
+                                Londres</span>
+                        </div>
+                    </div>
+
+                    <!-- Gastronomía -->
+                    <div class="glass visual-card">
+                        <img src="img/mexican_gastronomy.png" alt="Gastronomía Mexicana" class="photo">
+                        <div class="info">
+                            <h4>Gastronomía</h4>
+                            <p class="role">Más restaurantes "étnicos" exitosos del mundo · <span
+                                    class="teal">UNESCO</span></p>
+                            <span class="badge" style="background:rgba(20,184,166,0.15); color:var(--teal);">🌎
+                                Patrimonio</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="anim d3 quote-box" style="margin-top:18px; max-width:940px; width:100%;">
+                    <blockquote>«Nuestro mayor recurso es <span class="accent">nuestra gente</span>.»</blockquote>
                 </div>
             </div>
         </section>
 
-        <!-- ══ SLIDE 5: ESTACIONALIDAD ══ -->
+        <!-- ▸ SLIDE 5 — LOGROS OLÍMPICOS ▸ -->
         <section class="slide" id="slide-5">
-            <div class="max-w-4xl w-full">
-                <div class="text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 5 · Series de Tiempo</div>
-                <h2 class="text-4xl font-bold mb-2">Estacionalidad y <span class="text-teal">Efectos de
-                        Calendario</span></h2>
-                <p class="text-gray-400 mb-6">El envío de dinero y el flujo migratorio tienen <strong
-                        class="text-white">patrones cíclicos</strong>.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Picos -->
-                    <div class="flex flex-col gap-4">
-                        <div class="data-card flex gap-4 items-center">
-                            <div class="text-4xl">💐</div>
-                            <div>
-                                <p class="font-bold text-white">Mayo – Día de las Madres</p>
-                                <p class="text-gray-400 text-sm mt-1">Pico recurrente en envío de remesas. Incremento
-                                    estacional documentado año tras año.</p>
-                            </div>
-                        </div>
-                        <div class="data-card flex gap-4 items-center">
-                            <div class="text-4xl">🎄</div>
-                            <div>
-                                <p class="font-bold text-white">Diciembre – Navidad</p>
-                                <p class="text-gray-400 text-sm mt-1">Segundo pico mayor del año. También coincide con
-                                    retorno temporal de migrantes a México.</p>
-                            </div>
-                        </div>
+            <div style="width:100%; max-width:980px; display:flex; flex-direction:column; align-items:center;">
+                <div class="anim tag" style="align-self:flex-start;">Slide 5 · Deporte</div>
+                <h2 class="anim d1 slide-title" style="align-self:flex-start;">Orgullo <span
+                        class="gold">Olímpico</span> 🥇</h2>
+
+                <div class="anim d2" style="display:flex; gap:24px; align-items:stretch; width:100%;">
+                    <!-- Tabla 3x3 -->
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+                        <table class="olympic-table" style="flex:1;">
+                            <thead>
+                                <tr>
+                                    <th>Medalla</th>
+                                    <th>Atleta</th>
+                                    <th>Evento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="medal">🥇</td>
+                                    <td class="athlete">Joaquín Capilla</td>
+                                    <td>Clavados · Melbourne 1956</td>
+                                </tr>
+                                <tr>
+                                    <td class="medal">🥇</td>
+                                    <td class="athlete">María del Rosario Espinoza</td>
+                                    <td>Taekwondo · Beijing 2008</td>
+                                </tr>
+                                <tr>
+                                    <td class="medal">🥇</td>
+                                    <td class="athlete">Guillermo Pérez</td>
+                                    <td>Taekwondo · Beijing 2008</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <!-- Ajuste -->
-                    <div class="data-card flex flex-col justify-center">
-                        <div class="flex gap-3 items-start mb-4">
-                            <span class="text-2xl">🔧</span>
-                            <p class="text-white font-semibold">Ajuste Estacional</p>
+
+                    <!-- 3 Deportes estrella -->
+                    <div style="display:flex; gap:16px; flex:1.2;">
+                        <!-- 1. Clavados -->
+                        <div class="glass visual-card" style="flex:1;">
+                            <img src="img/mexican_diving.png" alt="Clavados – Deporte estrella #1" class="photo">
+                            <div class="info">
+                                <h4>🥇 Clavados</h4>
+                                <p class="role"><span class="teal">17 medallas</span> · Deporte estrella</p>
+                                <span class="badge" style="background:rgba(20,184,166,0.15); color:var(--teal);">1°
+                                    Lugar</span>
+                            </div>
                         </div>
-                        <p class="text-gray-300 text-sm leading-relaxed">
-                            Para saber si la migración <em class="text-white">"realmente"</em> aumentó en un mes,
-                            debemos usar <strong class="text-teal">cifras desestacionalizadas</strong> para eliminar
-                            estos efectos
-                            repetitivos anuales.
-                        </p>
-                        <div class="mt-4 rounded-xl p-3 text-center text-xs text-gray-500"
-                            style="background:rgba(20,184,166,0.07); border:1px solid rgba(20,184,166,0.2);">
-                            Dato original − Componente estacional = <strong class="text-teal">Valor ajustado</strong>
+
+                        <!-- 2. Boxeo -->
+                        <div class="glass visual-card" style="flex:1;">
+                            <img src="img/mexican_boxing.png" alt="Boxeo – Deporte estrella #2" class="photo">
+                            <div class="info">
+                                <h4>🥊 Boxeo</h4>
+                                <p class="role"><span class="gold">14 medallas</span> olímpicas</p>
+                                <span class="badge" style="background:rgba(245,158,11,0.15); color:var(--gold);">2°
+                                    Lugar</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. Atletismo -->
+                        <div class="glass visual-card" style="flex:1;">
+                            <img src="img/mexican_athletics.png" alt="Atletismo – Deporte estrella #3" class="photo">
+                            <div class="info">
+                                <h4>🏃 Atletismo</h4>
+                                <p class="role"><span class="accent">12 medallas</span> · Marcha y fondo</p>
+                                <span class="badge" style="background:rgba(232,76,61,0.15); color:var(--accent);">3°
+                                    Lugar</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ══ SLIDE 6: FUENTES DE INFORMACIÓN ══ -->
+        <!-- ▸ SLIDE 6 — FUENTES ▸ -->
         <section class="slide" id="slide-6">
-            <div class="max-w-4xl w-full">
-                <div class="text-xs tracking-widest text-gray-500 uppercase mb-2">Slide 6 · Referencias</div>
-                <h2 class="text-4xl font-bold mb-2">Fuentes de <span class="text-gold">Información</span></h2>
-                <p class="text-gray-400 mb-6">Los datos provienen de organismos con distintos <strong
-                        class="text-white">calendarios de difusión</strong>.</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div class="data-card text-center">
-                        <div class="text-4xl mb-3">🏦</div>
-                        <h3 class="font-bold text-gold mb-2">Banco de México</h3>
-                        <p class="text-gray-400 text-sm">Reportes <strong class="text-white">mensuales</strong> de
-                            remesas. Fuente primaria para flujos de divisas al país.</p>
-                        <div class="mt-3 text-xs px-3 py-1 rounded-full inline-block"
-                            style="background:rgba(245,158,11,0.12); color:#f59e0b;">Periodicidad: Mensual</div>
-                    </div>
-                    <div class="data-card text-center">
-                        <div class="text-4xl mb-3">🛂</div>
-                        <h3 class="font-bold text-teal mb-2">IME (SRE)</h3>
-                        <p class="text-gray-400 text-sm">Estadísticas de mexicanos en el exterior. Coordina la red
-                            consular a nivel mundial.</p>
-                        <div class="mt-3 text-xs px-3 py-1 rounded-full inline-block"
-                            style="background:rgba(20,184,166,0.12); color:#14b8a6;">Periodicidad: Anual</div>
-                    </div>
-                    <div class="data-card text-center">
-                        <div class="text-4xl mb-3">🇺🇸</div>
-                        <h3 class="font-bold text-purple-400 mb-2">Censo EE. UU. (ACS)</h3>
-                        <p class="text-gray-400 text-sm">La fuente primaria para el <strong
-                                class="text-white">acervo</strong> de mexicanos en territorio estadounidense.</p>
-                        <div class="mt-3 text-xs px-3 py-1 rounded-full inline-block"
-                            style="background:rgba(124,58,237,0.12); color:#a78bfa;">Periodicidad: Anual</div>
-                    </div>
-                </div>
-                <!-- Final CTA -->
-                <div class="mt-6 text-center">
-                    <p class="text-gray-500 text-sm">INGeólicos · 2026 — <span class="text-accent">Mexicanos en el
-                            Mundo</span></p>
+            <div style="width:100%; max-width:780px; display:flex; flex-direction:column; align-items:center;">
+                <div class="anim tag" style="align-self:flex-start;">Slide 6 · Referencias</div>
+                <h2 class="anim d1 slide-title" style="align-self:flex-start;">Fuentes de <span
+                        class="gold">Información</span></h2>
+
+                <ul class="source-list anim d2">
+                    <li class="source-item">
+                        <div class="source-num">1</div>
+                        <p><strong>SECIHTI</strong> — Talento mexicano en el <span class="purple">CERN</span> (2025)</p>
+                    </li>
+                    <li class="source-item">
+                        <div class="source-num">2</div>
+                        <p><strong>Red Global MX / IME</strong> — Vinculación de la diáspora calificada</p>
+                    </li>
+                    <li class="source-item">
+                        <div class="source-num">3</div>
+                        <p><strong>UNESCO</strong> — Industrias Creativas y Patrimonio Inmaterial</p>
+                    </li>
+                    <li class="source-item">
+                        <div class="source-num">4</div>
+                        <p><strong>IT Masters Mag (2025)</strong> — México líder en <span
+                                class="teal">nearshoring</span></p>
+                    </li>
+                    <li class="source-item">
+                        <div class="source-num">5</div>
+                        <p><strong>NASA / JPL</strong> — Ingenieros mexicanos en misiones espaciales</p>
+                    </li>
+                </ul>
+
+                <div class="anim d3" style="margin-top:20px; text-align:center;">
+                    <p style="font-size:0.78rem; color:#4b5563;">Equipo 3 RyNM · 2026 — <span class="accent">Capital
+                            Humano
+                            e Identidad Global</span></p>
                 </div>
             </div>
         </section>
 
     </div><!-- end slide-wrapper -->
 
-    <!-- Navigation Buttons -->
+    <!-- Navigation -->
     <button class="nav-btn" id="btn-prev">← Anterior</button>
-    <div id="slide-counter">1 / 6</div>
+    <div id="slide-counter"></div>
     <button class="nav-btn" id="btn-next">Siguiente →</button>
-
-    <!-- Progress Bar -->
     <div id="progress-bar"></div>
 
+    <!-- ═══════ SCRIPTS ═══════ -->
     <script>
-        // ── SLIDE LOGIC ──
-        const slides = document.querySelectorAll('.slide');
-        const counter = document.getElementById('slide-counter');
-        const progressBar = document.getElementById('progress-bar');
-        let current = 0;
-
-        function goTo(index) {
-            const prev = current;
-            current = Math.max(0, Math.min(slides.length - 1, index));
-            if (prev === current) return;
-
-            // Direction
-            slides[prev].classList.remove('active');
-            slides[prev].classList.add('exit-left');
-            setTimeout(() => slides[prev].classList.remove('exit-left'), 500);
-
-            slides[current].classList.add('active');
-
-            // Counter
-            counter.textContent = `${current + 1} / ${slides.length}`;
-
-            // Progress Bar
-            progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
-
-            // Draw chart on slide 3
-            if (current === 2) initChart();
-        }
-
-        document.getElementById('btn-next').addEventListener('click', () => goTo(current + 1));
-        document.getElementById('btn-prev').addEventListener('click', () => goTo(current - 1));
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
-        });
-
-        // Init progress
-        progressBar.style.width = `${(1 / slides.length) * 100}%`;
-
-        // ── CHART.JS ──
-        let chartCreated = false;
-        function initChart() {
-            if (chartCreated) return;
-            chartCreated = true;
-            const ctx = document.getElementById('diasporaChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['EE. UU. (97%)', 'Resto del Mundo (3%)'],
-                    datasets: [{
-                        data: [97, 3],
-                        backgroundColor: ['#e84c3d', '#14b8a6'],
-                        borderColor: ['#0d0d1a'],
-                        borderWidth: 4,
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '65%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#d1d5db',
-                                font: { family: 'Outfit', size: 12 },
-                                padding: 16
-                            }
-                        },
-                        tooltip: {
-                            bodyFont: { family: 'Outfit' },
-                            callbacks: {
-                                label: (ctx) => ` ${ctx.label}: ${ctx.raw}%`
-                            }
-                        }
-                    }
+        // ── PARTICLES ──
+        (function () {
+            const c = document.getElementById('bg-canvas'), x = c.getContext('2d');
+            let w, h, pts = [];
+            function resize() { w = c.width = innerWidth; h = c.height = innerHeight; }
+            addEventListener('resize', resize); resize();
+            class P {
+                constructor() { this.reset(); }
+                reset() { this.x = Math.random() * w; this.y = Math.random() * h; this.r = Math.random() * 1.4 + 0.3; this.vx = (Math.random() - 0.5) * 0.25; this.vy = (Math.random() - 0.5) * 0.25; this.a = Math.random() * 0.45 + 0.08; }
+                update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.reset(); }
+                draw() { x.beginPath(); x.arc(this.x, this.y, this.r, 0, Math.PI * 2); x.fillStyle = `rgba(168,85,247,${this.a})`; x.fill(); }
+            }
+            for (let i = 0; i < 70; i++) pts.push(new P());
+            (function loop() {
+                x.clearRect(0, 0, w, h);
+                pts.forEach(p => { p.update(); p.draw(); });
+                for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
+                    const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < 110) { x.beginPath(); x.moveTo(pts[i].x, pts[i].y); x.lineTo(pts[j].x, pts[j].y); x.strokeStyle = `rgba(168,85,247,${0.05 * (1 - d / 110)})`; x.lineWidth = 0.5; x.stroke(); }
                 }
-            });
-        }
-    </script>
+                requestAnimationFrame(loop);
+            })();
+        })();
 
+        // ── SLIDES ──
+        const slides = document.querySelectorAll('.slide');
+        const cEl = document.getElementById('slide-counter');
+        const pBar = document.getElementById('progress-bar');
+        let cur = 0;
+        slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); d.addEventListener('click', () => goTo(i)); cEl.appendChild(d); });
+        const dots = cEl.querySelectorAll('.dot');
+
+        function goTo(idx) {
+            if (idx === cur || idx < 0 || idx >= slides.length) return;
+            const prev = cur; cur = idx;
+
+            // Exit old slide
+            slides[prev].classList.remove('active');
+            slides[prev].classList.remove('exit-left');
+            slides[prev].classList.remove('exit-right');
+            slides[prev].classList.add(idx > prev ? 'exit-left' : 'exit-right');
+
+            // Enter new slide
+            slides[cur].classList.remove('exit-left');
+            slides[cur].classList.remove('exit-right');
+            slides[cur].classList.add('active');
+
+            // Restart animations explicitly to fix disappearing info
+            const anims = slides[cur].querySelectorAll('.anim');
+            anims.forEach(el => el.style.animation = 'none');
+            void slides[cur].offsetWidth; // force browser layout reflow
+            anims.forEach(el => el.style.animation = '');
+
+            dots.forEach((d, i) => d.classList.toggle('active', i === cur));
+            pBar.style.width = `${((cur + 1) / slides.length) * 100}%`;
+        }
+
+        document.getElementById('btn-next').addEventListener('click', () => goTo(cur + 1));
+        document.getElementById('btn-prev').addEventListener('click', () => goTo(cur - 1));
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(cur + 1);
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(cur - 1);
+        });
+        pBar.style.width = `${(1 / slides.length) * 100}%`;
+    </script>
 </body>
 
 </html>
