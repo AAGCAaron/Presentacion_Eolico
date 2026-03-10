@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sector Secundario | Equipo 3 RyNM</title>
+    <meta name="description" content="Sector Secundario de la Economía: Industria Pesada, Bienes de Equipo e Industria Ligera con empresas líderes mundiales.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:     #07091c;
+            --blue:   #2563eb;
+            --steel:  #94a3b8;
+            --steelL: #cbd5e1;
+            --gold:   #f59e0b;
+            --white:  #f1f5f9;
+            --glass:  rgba(255,255,255,0.04);
+            --border: rgba(255,255,255,0.09);
+            --r:      14px;
+        }
+
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--white);
+        }
+
+        /* ── BACKGROUND GLOW ── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse 70% 55% at 15% 15%, rgba(37,99,235,.18) 0%, transparent 60%),
+                radial-gradient(ellipse 55% 45% at 85% 85%, rgba(124,58,237,.13) 0%, transparent 60%),
+                #07091c;
+            pointer-events: none;
+        }
+
+        /* ── TOP NAV ── */
+        #top-navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+            display: flex; align-items: center; gap: 4px;
+            padding: 10px 20px;
+            background: rgba(7,9,28,.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+        }
+        #top-navbar .brand {
+            font-size: 12px; font-weight: 800; color: var(--gold);
+            letter-spacing: 1px; text-transform: uppercase; margin-right: 12px;
+        }
+        #top-navbar a {
+            text-decoration: none; color: #99a; font-size: 12px; font-weight: 500;
+            padding: 5px 13px; border-radius: 20px;
+            transition: all .22s; border: 1px solid transparent;
+        }
+        #top-navbar a:hover { color: #fff; background: rgba(120,100,220,.22); border-color: rgba(120,100,220,.45); }
+        #top-navbar a.on { color: #fff; background: rgba(37,99,235,.38); border-color: rgba(37,99,235,.65); }
+
+        /* ── SCROLL CONTAINER ── */
+        .scroll-container {
+            position: fixed; inset: 0; top: 42px;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+            z-index: 1;
+        }
+        /* hide scrollbar */
+        .scroll-container::-webkit-scrollbar { display: none; }
+        .scroll-container { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ── SLIDES ── */
+        .slide {
+            height: calc(100vh - 42px);
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 60px 24px 24px; /* right padding for dot nav */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ── DOT NAVIGATION ── */
+        #dot-nav {
+            position: fixed;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .dot-btn {
+            width: 9px; height: 9px; border-radius: 50%;
+            background: rgba(255,255,255,0.22);
+            border: none; cursor: pointer;
+            transition: all .3s; padding: 0;
+        }
+        .dot-btn.active {
+            background: var(--blue);
+            box-shadow: 0 0 10px var(--blue);
+            transform: scale(1.4);
+        }
+        .dot-btn:hover { background: rgba(255,255,255,0.55); }
+
+        /* ── SLIDE INNER ── */
+        .slide-inner {
+            width: 100%; max-width: 1140px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* ── SLIDE 0: HERO ── */
+        #s0 { text-align: center; }
+        #s0 .slide-inner { align-items: center; }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(37,99,235,.14); border: 1px solid rgba(37,99,235,.38);
+            border-radius: 50px; padding: 5px 18px;
+            font-size: 11px; font-weight: 700; letter-spacing: 1.3px;
+            color: #93c5fd; text-transform: uppercase; margin-bottom: 22px;
+        }
+        .dot-pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 8px var(--blue); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+
+        #s0 h1 {
+            font-size: clamp(3.2rem, 8vw, 6rem); font-weight: 800; line-height: 1.05;
+            background: linear-gradient(135deg, #e2e8f0 0%, #93c5fd 55%, #818cf8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 18px;
+        }
+        #s0 .lead { font-size: 1.05rem; color: var(--steel); margin-bottom: 36px; line-height: 1.7; }
+        .hero-nums { display: flex; gap: 52px; justify-content: center; flex-wrap: wrap; }
+        .hn .n { font-size: 2.5rem; font-weight: 800; color: var(--gold); display: block; }
+        .hn .l { font-size: .72rem; color: var(--steel); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── SLIDE 1: INTRO ── */
+        #s1 { text-align: center; }
+        #s1 .slide-inner { align-items: center; }
+        .intro-box {
+            max-width: 800px;
+            padding: 48px 56px; text-align: center;
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 20px; backdrop-filter: blur(12px);
+        }
+        .intro-box .big-ico { font-size: 3.5rem; margin-bottom: 16px; display: block; }
+        .intro-box h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 16px; }
+        .intro-box p { font-size: 1rem; color: var(--steelL); line-height: 1.8; }
+
+        /* ── SLIDES 2,3,4: COMPANIES ── */
+        .sec-tag {
+            display: inline-block;
+            background: rgba(37,99,235,.13); border: 1px solid rgba(37,99,235,.32);
+            border-radius: 20px; padding: 3px 14px;
+            font-size: 11px; font-weight: 700; letter-spacing: 1.4px;
+            color: #60a5fa; text-transform: uppercase; margin-bottom: 8px;
+        }
+        .slide h2 {
+            font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 800;
+            background: linear-gradient(135deg, #f1f5f9, #93c5fd);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 6px;
+        }
+        .sec-desc { font-size: .88rem; color: var(--steel); margin-bottom: 22px; }
+
+        /* COMPANY GRID */
+        .grid6 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 14px;
+        }
+        .cc {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: var(--r); padding: 20px 12px 16px;
+            text-align: center;
+            transition: transform .28s, box-shadow .28s, border-color .28s;
+            position: relative; overflow: hidden;
+            cursor: default;
+        }
+        .cc::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+            background: var(--line, linear-gradient(90deg,#2563eb,#818cf8));
+            transform: scaleX(0); transform-origin: left; transition: transform .3s;
+        }
+        .cc:hover { transform: translateY(-5px); box-shadow: 0 14px 40px rgba(37,99,235,.20); border-color: rgba(37,99,235,.3); }
+        .cc:hover::after { transform: scaleX(1); }
+
+        .cc-logo {
+            width: 60px; height: 60px; object-fit: contain;
+            border-radius: 10px; background: rgba(255,255,255,.06);
+            padding: 6px; margin: 0 auto 10px; display: block;
+        }
+        .cc-svgwrap {
+            width: 60px; height: 60px;
+            border-radius: 10px; background: rgba(255,255,255,.06);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 10px; font-size: 1.8rem;
+        }
+        .rflag {
+            display: inline-block; font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+            padding: 2px 8px; border-radius: 20px; margin-bottom: 7px;
+        }
+        .mx { background: rgba(34,197,94,.13);  color: #4ade80; border: 1px solid rgba(34,197,94,.25); }
+        .us { background: rgba(59,130,246,.13); color: #60a5fa; border: 1px solid rgba(59,130,246,.25); }
+        .eu { background: rgba(129,140,248,.13);color: #a5b4fc; border: 1px solid rgba(129,140,248,.25); }
+        .ar { background: rgba(245,158,11,.13); color: #fbbf24; border: 1px solid rgba(245,158,11,.25); }
+        .cn { background: rgba(239,68,68,.13);  color: #f87171; border: 1px solid rgba(239,68,68,.25); }
+        .in { background: rgba(251,146,60,.13); color: #fb923c; border: 1px solid rgba(251,146,60,.25); }
+
+        .cc h3 { font-size: .9rem; font-weight: 700; margin-bottom: 3px; }
+        .cc .sub { font-size: .72rem; color: var(--steel); }
+
+        /* ── SLIDE 5: TABLE ── */
+        .tw { overflow-x: auto; width: 100%; }
+        table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+        thead tr { background: rgba(37,99,235,.22); border-bottom: 2px solid rgba(37,99,235,.45); }
+        thead th { padding: 12px 14px; text-align: left; font-weight: 700; color: #93c5fd; text-transform: uppercase; font-size: .7rem; letter-spacing: 1px; }
+        tbody tr { border-bottom: 1px solid rgba(255,255,255,.055); transition: background .2s; }
+        tbody tr:hover { background: rgba(37,99,235,.09); }
+        tbody td { padding: 11px 14px; color: var(--steelL); vertical-align: middle; }
+        tbody td:first-child { font-weight: 700; color: var(--white); }
+        .tl { width: 30px; height: 30px; object-fit: contain; background: rgba(255,255,255,.06); border-radius: 6px; padding: 3px; }
+
+        /* ── SLIDE 6: CONCLUSION ── */
+        #s6 .chain {
+            display: flex; align-items: stretch; justify-content: center;
+            gap: 0; margin: 24px 0;
+        }
+        .cs {
+            background: rgba(37,99,235,.10); border: 1px solid rgba(37,99,235,.28);
+            border-radius: 14px; padding: 22px 18px; text-align: center;
+            flex: 1; min-width: 160px;
+            transition: transform .3s, box-shadow .3s;
+        }
+        .cs:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(37,99,235,.18); }
+        .cs .ci { font-size: 2.2rem; margin-bottom: 8px; display: block; }
+        .cs h4 { font-size: .88rem; font-weight: 700; margin-bottom: 5px; }
+        .cs p { font-size: .75rem; color: var(--steel); line-height: 1.55; }
+        .ca { font-size: 1.5rem; color: rgba(37,99,235,.5); display: flex; align-items: center; padding: 0 6px; }
+        .ctext {
+            font-size: .92rem; color: var(--steelL); line-height: 1.8;
+            padding: 24px 32px; border-radius: 14px;
+            background: rgba(255,255,255,.03); border: 1px solid var(--border);
+            text-align: center; max-width: 820px; margin: 0 auto;
+        }
+
+        /* ── SLIDE TRANSITION ANIM ── */
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(22px); }
+            to   { opacity: 1; transform: none; }
+        }
+        .slide.active .slide-inner > * {
+            animation: fadeSlide .55s ease both;
+        }
+        .slide.active .slide-inner > *:nth-child(1) { animation-delay: 0s; }
+        .slide.active .slide-inner > *:nth-child(2) { animation-delay: .08s; }
+        .slide.active .slide-inner > *:nth-child(3) { animation-delay: .16s; }
+        .slide.active .slide-inner > *:nth-child(4) { animation-delay: .24s; }
+
+        /* ── GLASS TABLE WRAP ── */
+        .glass-box {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: var(--r); overflow: hidden;
+        }
+
+        /* ── SCROLL HINT ── */
+        .scroll-hint {
+            position: absolute; bottom: 18px; left: 50%;
+            transform: translateX(-50%);
+            font-size: .72rem; color: rgba(255,255,255,.25);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .scroll-hint span { animation: bob 1.8s infinite; }
+        @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+    </style>
+</head>
+<body>
+
+    <!-- TOP NAV -->
+    <div id="top-navbar">
+        <span class="brand">⚡ Equipo 3 RyNM</span>
+        <a href="index.html">🖥️ Presentación</a>
+        <a href="MapaConceptual_Indicadores.html">🗺️ Mapa</a>
+        <a href="Crucigrama_Indicadores.html">🧩 Crucigrama</a>
+        <a href="MexicoEnElMundo.html">🌎 México</a>
+        <a href="EmpresasSecundarias.html" class="on">🏭 Sector Secundario</a>
+    </div>
+
+    <!-- DOT NAVIGATION -->
+    <nav id="dot-nav">
+        <button class="dot-btn active" data-target="0" title="Inicio"></button>
+        <button class="dot-btn" data-target="1" title="Introducción"></button>
+        <button class="dot-btn" data-target="2" title="Industria Pesada"></button>
+        <button class="dot-btn" data-target="3" title="Bienes de Equipo"></button>
+        <button class="dot-btn" data-target="4" title="Industria Ligera"></button>
+        <button class="dot-btn" data-target="5" title="Tabla Comparativa"></button>
+        <button class="dot-btn" data-target="6" title="Conclusión"></button>
+    </nav>
+
+    <!-- SCROLL CONTAINER -->
+    <div class="scroll-container" id="sc">
+
+        <!-- ═══ SLIDE 0: HERO ═══ -->
+        <section class="slide active" id="s0">
+            <div class="slide-inner" style="align-items:center;text-align:center;">
+                <div class="badge"><span class="dot-pulse"></span> Sector Secundario · Economía · 2026</div>
+                <h1 style="font-size:clamp(3.2rem,8vw,6rem);font-weight:800;line-height:1.05;background:linear-gradient(135deg,#e2e8f0 0%,#93c5fd 55%,#818cf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:18px;">Sector<br>Secundario</h1>
+                <p class="lead">De la materia prima al producto final —<br>el motor industrial del mundo.</p>
+                <div class="hero-nums">
+                    <div class="hn"><span class="n">3</span><span class="l">Clasificaciones</span></div>
+                    <div class="hn"><span class="n">18</span><span class="l">Empresas</span></div>
+                    <div class="hn"><span class="n">6</span><span class="l">Regiones</span></div>
+                </div>
+            </div>
+            <div class="scroll-hint"><span>↓</span>Deslizar</div>
+        </section>
+
+        <!-- ═══ SLIDE 1: INTRO ═══ -->
+        <section class="slide" id="s1">
+            <div class="slide-inner" style="align-items:center;">
+                <div class="intro-box">
+                    <span class="big-ico">🏭</span>
+                    <div class="sec-tag">📖 Introducción</div>
+                    <h2>¿Qué es el Sector Secundario?</h2>
+                    <p>
+                        Comprende todas las actividades que transforman
+                        <strong style="color:#93c5fd">materias primas</strong> en bienes
+                        <strong style="color:#93c5fd">semielaborados o finales</strong>.
+                        Su pilar es la <strong style="color:#fbbf24">industria</strong>, que añade valor
+                        a los recursos naturales generando empleo y riqueza a escala global.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ SLIDE 2: INDUSTRIA PESADA ═══ -->
+        <section class="slide" id="s2">
+            <div class="slide-inner">
+                <div class="sec-tag">⚙️ Clasificación 1</div>
+                <h2>Industria Pesada</h2>
+                <p class="sec-desc">Transforma materias primas en <strong style="color:#93c5fd">productos semielaborados</strong> para otras industrias.</p>
+                <div class="grid6">
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#ef4444,#b91c1c)">
+                        <img src="img/cemex_logo.png" alt="CEMEX" class="cc-logo">
+                        <span class="rflag mx">🇲🇽 México</span>
+                        <h3>CEMEX</h3>
+                        <p class="sub">Cemento</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#3b82f6,#1e40af)">
+                        <img src="img/exxonmobil_logo.png" alt="ExxonMobil" class="cc-logo">
+                        <span class="rflag us">🇺🇸 EE.UU.</span>
+                        <h3>ExxonMobil</h3>
+                        <p class="sub">Petroquímica</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#818cf8,#4f46e5)">
+                        <img src="img/arcelormittal_logo.png" alt="ArcelorMittal" class="cc-logo">
+                        <span class="rflag eu">🇱🇺 Europa</span>
+                        <h3>ArcelorMittal</h3>
+                        <p class="sub">Acero</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#10b981,#065f46)">
+                        <img src="img/saudi_aramco_logo.png" alt="Saudi Aramco" class="cc-logo">
+                        <span class="rflag ar">🇸🇦 Mundo Árabe</span>
+                        <h3>Saudi Aramco</h3>
+                        <p class="sub">Petróleo</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#ef4444,#7f1d1d)">
+                        <img src="img/sinopec_logo.png" alt="Sinopec" class="cc-logo">
+                        <span class="rflag cn">🇨🇳 China</span>
+                        <h3>Sinopec</h3>
+                        <p class="sub">Petroquímica</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#fb923c,#7c3aed)">
+                        <img src="img/tata_steel_logo.png" alt="Tata Steel" class="cc-logo">
+                        <span class="rflag in">🇮🇳 India</span>
+                        <h3>Tata Steel</h3>
+                        <p class="sub">Acero</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ SLIDE 3: BIENES DE EQUIPO ═══ -->
+        <section class="slide" id="s3">
+            <div class="slide-inner">
+                <div class="sec-tag">🔩 Clasificación 2</div>
+                <h2>Bienes de Equipo</h2>
+                <p class="sec-desc">Fabrica <strong style="color:#93c5fd">maquinaria y herramientas</strong> que equipan a otras industrias.</p>
+                <div class="grid6">
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#06b6d4,#0e7490)">
+                        <img src="img/vitro_logo.png" alt="Vitro" class="cc-logo">
+                        <span class="rflag mx">🇲🇽 México</span>
+                        <h3>Vitro</h3>
+                        <p class="sub">Vidrio Industrial</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#f59e0b,#92400e)">
+                        <img src="img/caterpillar_logo.png" alt="Caterpillar" class="cc-logo">
+                        <span class="rflag us">🇺🇸 EE.UU.</span>
+                        <h3>Caterpillar</h3>
+                        <p class="sub">Maquinaria Pesada</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#818cf8,#4f46e5)">
+                        <img src="img/siemens_logo.png" alt="Siemens" class="cc-logo">
+                        <span class="rflag eu">🇩🇪 Europa</span>
+                        <h3>Siemens</h3>
+                        <p class="sub">Ingeniería</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#10b981,#065f46)">
+                        <img src="img/emirates_steel_logo.png" alt="Emirates Steel" class="cc-logo">
+                        <span class="rflag ar">🇦🇪 Mundo Árabe</span>
+                        <h3>Emirates Steel</h3>
+                        <p class="sub">Acero Industrial</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#ef4444,#7f1d1d)">
+                        <img src="img/sany_group_logo.png" alt="Sany Group" class="cc-logo">
+                        <span class="rflag cn">🇨🇳 China</span>
+                        <h3>Sany Group</h3>
+                        <p class="sub">Grúas &amp; Excavadoras</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#fb923c,#1d4ed8)">
+                        <img src="img/bhel_logo.png" alt="BHEL" class="cc-logo">
+                        <span class="rflag in">🇮🇳 India</span>
+                        <h3>BHEL</h3>
+                        <p class="sub">Turbinas &amp; Equipos</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ SLIDE 4: INDUSTRIA LIGERA ═══ -->
+        <section class="slide" id="s4">
+            <div class="slide-inner">
+                <div class="sec-tag">🛒 Clasificación 3</div>
+                <h2>Industria Ligera</h2>
+                <p class="sec-desc">Produce <strong style="color:#93c5fd">bienes finales</strong> listos para el consumidor.</p>
+                <div class="grid6">
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#fb923c,#ea580c)">
+                        <img src="img/grupo_bimbo_logo.png" alt="Grupo Bimbo" class="cc-logo">
+                        <span class="rflag mx">🇲🇽 México</span>
+                        <h3>Grupo Bimbo</h3>
+                        <p class="sub">Panificación</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#3b82f6,#dc2626)">
+                        <img src="img/pepsico_logo.png" alt="PepsiCo" class="cc-logo">
+                        <span class="rflag us">🇺🇸 EE.UU.</span>
+                        <h3>PepsiCo</h3>
+                        <p class="sub">Bebidas &amp; Snacks</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#818cf8,#312e81)">
+                        <img src="img/nestle_logo.png" alt="Nestlé" class="cc-logo">
+                        <span class="rflag eu">🇨🇭 Europa</span>
+                        <h3>Nestlé</h3>
+                        <p class="sub">Alimentos</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#10b981,#065f46)">
+                        <img src="img/almarai_logo.png" alt="Almarai" class="cc-logo">
+                        <span class="rflag ar">🇸🇦 Mundo Árabe</span>
+                        <h3>Almarai</h3>
+                        <p class="sub">Lácteos</p>
+                    </div>
+
+                    <!-- Yili: SVG icon (image quota exhausted) -->
+                    <div class="cc" style="--line:linear-gradient(90deg,#ef4444,#7f1d1d)">
+                        <div class="cc-svgwrap">
+                            <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                                <circle cx="21" cy="21" r="21" fill="rgba(37,99,235,0.18)"/>
+                                <path d="M10 17 Q21 8 32 17 Q32 31 21 35 Q10 31 10 17Z" fill="#2563eb" opacity=".75"/>
+                                <ellipse cx="21" cy="21" rx="6.5" ry="7.5" fill="white" opacity=".9"/>
+                                <ellipse cx="21" cy="22" rx="3" ry="3.5" fill="#2563eb" opacity=".65"/>
+                            </svg>
+                        </div>
+                        <span class="rflag cn">🇨🇳 China</span>
+                        <h3>Yili Group</h3>
+                        <p class="sub">Lácteos</p>
+                    </div>
+
+                    <div class="cc" style="--line:linear-gradient(90deg,#fb923c,#7c3aed)">
+                        <img src="img/tata_logo.png" alt="Tata Consumer" class="cc-logo">
+                        <span class="rflag in">🇮🇳 India</span>
+                        <h3>Tata Consumer</h3>
+                        <p class="sub">Té &amp; Alimentos</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ SLIDE 5: TABLA ═══ -->
+        <section class="slide" id="s5">
+            <div class="slide-inner">
+                <div class="sec-tag">📊 Comparativa Global</div>
+                <h2>Empresas Líderes por Región</h2>
+                <p class="sec-desc" style="margin-bottom:16px;">Las 6 regiones y su representante en cada clasificación industrial.</p>
+                <div class="glass-box tw">
+                    <table id="tabla-comparativa">
+                        <thead>
+                            <tr>
+                                <th>Región</th>
+                                <th colspan="2">⚙️ Industria Pesada</th>
+                                <th colspan="2">🔩 Bienes de Equipo</th>
+                                <th colspan="2">🛒 Industria Ligera</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>🇲🇽 México</td>
+                                <td>CEMEX</td>
+                                <td><img src="img/cemex_logo.png" alt="CEMEX" class="tl"></td>
+                                <td>Vitro</td>
+                                <td><img src="img/vitro_logo.png" alt="Vitro" class="tl"></td>
+                                <td>Grupo Bimbo</td>
+                                <td><img src="img/grupo_bimbo_logo.png" alt="Bimbo" class="tl"></td>
+                            </tr>
+                            <tr>
+                                <td>🇺🇸 EE.UU.</td>
+                                <td>ExxonMobil</td>
+                                <td><img src="img/exxonmobil_logo.png" alt="Exxon" class="tl"></td>
+                                <td>Caterpillar</td>
+                                <td><img src="img/caterpillar_logo.png" alt="CAT" class="tl"></td>
+                                <td>PepsiCo</td>
+                                <td><img src="img/pepsico_logo.png" alt="PepsiCo" class="tl"></td>
+                            </tr>
+                            <tr>
+                                <td>🇩🇪 Europa</td>
+                                <td>ArcelorMittal</td>
+                                <td><img src="img/arcelormittal_logo.png" alt="Arcelor" class="tl"></td>
+                                <td>Siemens</td>
+                                <td><img src="img/siemens_logo.png" alt="Siemens" class="tl"></td>
+                                <td>Nestlé</td>
+                                <td><img src="img/nestle_logo.png" alt="Nestlé" class="tl"></td>
+                            </tr>
+                            <tr>
+                                <td>🇸🇦 Mundo Árabe</td>
+                                <td>Saudi Aramco</td>
+                                <td><img src="img/saudi_aramco_logo.png" alt="Aramco" class="tl"></td>
+                                <td>Emirates Steel</td>
+                                <td><img src="img/emirates_steel_logo.png" alt="Emirates" class="tl"></td>
+                                <td>Almarai</td>
+                                <td><img src="img/almarai_logo.png" alt="Almarai" class="tl"></td>
+                            </tr>
+                            <tr>
+                                <td>🇨🇳 China</td>
+                                <td>Sinopec</td>
+                                <td><img src="img/sinopec_logo.png" alt="Sinopec" class="tl"></td>
+                                <td>Sany Group</td>
+                                <td><img src="img/sany_group_logo.png" alt="Sany" class="tl"></td>
+                                <td>Yili Group</td>
+                                <td><div style="width:30px;height:30px;background:rgba(255,255,255,.06);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;">🥛</div></td>
+                            </tr>
+                            <tr>
+                                <td>🇮🇳 India</td>
+                                <td>Tata Steel</td>
+                                <td><img src="img/tata_steel_logo.png" alt="Tata Steel" class="tl"></td>
+                                <td>BHEL</td>
+                                <td><img src="img/bhel_logo.png" alt="BHEL" class="tl"></td>
+                                <td>Tata Consumer</td>
+                                <td><img src="img/tata_logo.png" alt="Tata Consumer" class="tl"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ SLIDE 6: CONCLUSIÓN ═══ -->
+        <section class="slide" id="s6">
+            <div class="slide-inner">
+                <div class="sec-tag">✅ Conclusión</div>
+                <h2 style="margin-bottom:20px;">Cadena de Valor Industrial</h2>
+                <div class="chain">
+                    <div class="cs">
+                        <span class="ci">⛏️</span>
+                        <h4>Industria Pesada</h4>
+                        <p>Recursos → Acero, Cemento, Petróleo</p>
+                    </div>
+                    <div class="ca">→</div>
+                    <div class="cs">
+                        <span class="ci">⚙️</span>
+                        <h4>Bienes de Equipo</h4>
+                        <p>Materiales → Maquinaria y herramientas</p>
+                    </div>
+                    <div class="ca">→</div>
+                    <div class="cs">
+                        <span class="ci">🛒</span>
+                        <h4>Industria Ligera</h4>
+                        <p>Semielaborados → Productos de consumo</p>
+                    </div>
+                    <div class="ca">→</div>
+                    <div class="cs" style="background:rgba(245,158,11,.09);border-color:rgba(245,158,11,.28);">
+                        <span class="ci">🌍</span>
+                        <h4>Consumidor Final</h4>
+                        <p>Mayor calidad de vida</p>
+                    </div>
+                </div>
+                <div class="ctext">
+                    El Sector Secundario es el <strong style="color:#93c5fd">corazón del sistema económico industrial</strong>.
+                    Empresas como <strong style="color:#fbbf24">CEMEX, Siemens y Grupo Bimbo</strong> demuestran que el desarrollo
+                    de una nación depende de la fortaleza de toda su cadena industrial.
+                </div>
+                <p style="text-align:center;margin-top:18px;font-size:.75rem;color:rgba(255,255,255,.2);">⚡ Equipo 3 RyNM · 2026</p>
+            </div>
+        </section>
+
+    </div><!-- /scroll-container -->
+
+    <script>
+        const sc    = document.getElementById('sc');
+        const slides = Array.from(document.querySelectorAll('.slide'));
+        const dots   = Array.from(document.querySelectorAll('.dot-btn'));
+        let current  = 0;
+
+        function setActive(idx) {
+            slides[current].classList.remove('active');
+            dots[current].classList.remove('active');
+            current = idx;
+            slides[current].classList.add('active');
+            dots[current].classList.add('active');
+        }
+
+        // Scroll observer
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    const idx = slides.indexOf(e.target);
+                    if (idx !== -1) setActive(idx);
+                }
+            });
+        }, { root: sc, threshold: 0.55 });
+
+        slides.forEach(s => io.observe(s));
+
+        // Dot click → scroll to slide
+        dots.forEach((btn, i) => {
+            btn.addEventListener('click', () => {
+                slides[i].scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Keyboard arrow navigation
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+                e.preventDefault();
+                const next = Math.min(current + 1, slides.length - 1);
+                slides[next].scrollIntoView({ behavior: 'smooth' });
+            }
+            if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                const prev = Math.max(current - 1, 0);
+                slides[prev].scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
