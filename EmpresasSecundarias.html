@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -166,22 +166,22 @@
             color: #60a5fa; text-transform: uppercase; margin-bottom: 8px;
         }
         .slide h2 {
-            font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 800;
+            font-size: clamp(1.9rem, 3.5vw, 2.7rem); font-weight: 800;
             background: linear-gradient(135deg, #f1f5f9, #93c5fd);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
-        .sec-desc { font-size: .88rem; color: var(--steel); margin-bottom: 22px; }
+        .sec-desc { font-size: 1rem; color: var(--steel); margin-bottom: 22px; }
 
         /* COMPANY GRID */
         .grid6 {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 14px;
+            gap: 18px;
         }
         .cc {
             background: var(--glass); border: 1px solid var(--border);
-            border-radius: var(--r); padding: 20px 12px 16px;
+            border-radius: var(--r); padding: 28px 16px 22px;
             text-align: center;
             transition: transform .28s, box-shadow .28s, border-color .28s;
             position: relative; overflow: hidden;
@@ -197,9 +197,9 @@
         .cc:hover::after { transform: scaleX(1); }
 
         .cc-logo {
-            width: 60px; height: 60px; object-fit: contain;
-            border-radius: 10px; background: rgba(255,255,255,.06);
-            padding: 6px; margin: 0 auto 10px; display: block;
+            width: 88px; height: 88px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,.06);
+            padding: 8px; margin: 0 auto 14px; display: block;
         }
         .cc-svgwrap {
             width: 60px; height: 60px;
@@ -208,9 +208,9 @@
             margin: 0 auto 10px; font-size: 1.8rem;
         }
         .rflag {
-            display: inline-block; font-size: 10px; font-weight: 700;
+            display: inline-block; font-size: 11px; font-weight: 700;
             text-transform: uppercase; letter-spacing: 1px;
-            padding: 2px 8px; border-radius: 20px; margin-bottom: 7px;
+            padding: 3px 10px; border-radius: 20px; margin-bottom: 9px;
         }
         .mx { background: rgba(34,197,94,.13);  color: #4ade80; border: 1px solid rgba(34,197,94,.25); }
         .us { background: rgba(59,130,246,.13); color: #60a5fa; border: 1px solid rgba(59,130,246,.25); }
@@ -219,8 +219,8 @@
         .cn { background: rgba(239,68,68,.13);  color: #f87171; border: 1px solid rgba(239,68,68,.25); }
         .in { background: rgba(251,146,60,.13); color: #fb923c; border: 1px solid rgba(251,146,60,.25); }
 
-        .cc h3 { font-size: .9rem; font-weight: 700; margin-bottom: 3px; }
-        .cc .sub { font-size: .72rem; color: var(--steel); }
+        .cc h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 5px; }
+        .cc .sub { font-size: .82rem; color: var(--steel); }
 
         /* ── SLIDE 5: TABLE ── */
         .tw { overflow-x: auto; width: 100%; }
@@ -314,7 +314,9 @@
 
         <!-- ═══ SLIDE 0: HERO ═══ -->
         <section class="slide active" id="s0">
-            <div class="slide-inner" style="align-items:center;text-align:center;">
+            <!-- Particle Canvas -->
+            <canvas id="hero-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+            <div class="slide-inner" style="align-items:center;text-align:center;position:relative;z-index:1;">
                 <div class="badge"><span class="dot-pulse"></span> Sector Secundario · Economía · 2026</div>
                 <h1 style="font-size:clamp(3.2rem,8vw,6rem);font-weight:800;line-height:1.05;background:linear-gradient(135deg,#e2e8f0 0%,#93c5fd 55%,#818cf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:18px;">Sector<br>Secundario</h1>
                 <p class="lead">De la materia prima al producto final —<br>el motor industrial del mundo.</p>
@@ -324,7 +326,7 @@
                     <div class="hn"><span class="n">6</span><span class="l">Regiones</span></div>
                 </div>
             </div>
-            <div class="scroll-hint"><span>↓</span>Deslizar</div>
+            <div class="scroll-hint" style="position:relative;z-index:1;"><span>↓</span>Deslizar</div>
         </section>
 
         <!-- ═══ SLIDE 1: INTRO ═══ -->
@@ -585,30 +587,32 @@
         </section>
 
         <!-- ═══ SLIDE 6: CONCLUSIÓN ═══ -->
-        <section class="slide" id="s6">
-            <div class="slide-inner">
+        <section class="slide" id="s6" style="position:relative;overflow:hidden;">
+            <!-- Flow Canvas -->
+            <canvas id="chain-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+            <div class="slide-inner" style="position:relative;z-index:1;">
                 <div class="sec-tag">✅ Conclusión</div>
                 <h2 style="margin-bottom:20px;">Cadena de Valor Industrial</h2>
-                <div class="chain">
-                    <div class="cs">
+                <div class="chain" id="chain-steps">
+                    <div class="cs chain-node">
                         <span class="ci">⛏️</span>
                         <h4>Industria Pesada</h4>
                         <p>Recursos → Acero, Cemento, Petróleo</p>
                     </div>
                     <div class="ca">→</div>
-                    <div class="cs">
+                    <div class="cs chain-node">
                         <span class="ci">⚙️</span>
                         <h4>Bienes de Equipo</h4>
                         <p>Materiales → Maquinaria y herramientas</p>
                     </div>
                     <div class="ca">→</div>
-                    <div class="cs">
+                    <div class="cs chain-node">
                         <span class="ci">🛒</span>
                         <h4>Industria Ligera</h4>
                         <p>Semielaborados → Productos de consumo</p>
                     </div>
                     <div class="ca">→</div>
-                    <div class="cs" style="background:rgba(245,158,11,.09);border-color:rgba(245,158,11,.28);">
+                    <div class="cs chain-node" style="background:rgba(245,158,11,.09);border-color:rgba(245,158,11,.28);">
                         <span class="ci">🌍</span>
                         <h4>Consumidor Final</h4>
                         <p>Mayor calidad de vida</p>
@@ -671,6 +675,154 @@
                 slides[prev].scrollIntoView({ behavior: 'smooth' });
             }
         });
+    </script>
+
+    <!-- ANIMACION HERO: Engranajes + Particulas Industriales -->
+    <script>
+    (function() {
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        let W, H, particles, gears, sparks, raf, running = false;
+
+        function resize() {
+            const r = canvas.parentElement.getBoundingClientRect();
+            W = canvas.width = r.width; H = canvas.height = r.height;
+        }
+        function mkParticle() {
+            return { x:Math.random()*W, y:Math.random()*H, r:Math.random()*2.5+1,
+                vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5,
+                alpha:Math.random()*0.5+0.1,
+                color:['#2563eb','#818cf8','#38bdf8','#f59e0b'][Math.floor(Math.random()*4)] };
+        }
+        function mkGear(x,y,r,teeth,speed,color){ return {x,y,r,teeth,angle:Math.random()*Math.PI*2,speed,color}; }
+        function drawGear(g) {
+            const th=g.r*0.35, ir=g.r*0.62;
+            ctx.save(); ctx.translate(g.x,g.y); ctx.rotate(g.angle);
+            ctx.beginPath();
+            for(let i=0;i<g.teeth;i++){
+                const a1=(i/g.teeth)*Math.PI*2,a2=((i+0.4)/g.teeth)*Math.PI*2;
+                const a3=((i+0.6)/g.teeth)*Math.PI*2,a4=((i+1)/g.teeth)*Math.PI*2;
+                ctx.lineTo(Math.cos(a1)*ir,Math.sin(a1)*ir);
+                ctx.lineTo(Math.cos(a2)*(g.r+th),Math.sin(a2)*(g.r+th));
+                ctx.lineTo(Math.cos(a3)*(g.r+th),Math.sin(a3)*(g.r+th));
+                ctx.lineTo(Math.cos(a4)*ir,Math.sin(a4)*ir);
+            }
+            ctx.closePath();
+            ctx.strokeStyle=g.color; ctx.lineWidth=1.5; ctx.globalAlpha=0.18; ctx.stroke();
+            ctx.beginPath(); ctx.arc(0,0,g.r*0.22,0,Math.PI*2); ctx.stroke();
+            ctx.globalAlpha=1; ctx.restore();
+        }
+        function mkSpark() {
+            const edge=Math.random();
+            const x=edge<0.5?Math.random()*W:(edge<0.75?0:W);
+            const y=edge<0.5?(Math.random()<0.5?0:H):Math.random()*H;
+            const angle=Math.atan2(H/2-y,W/2-x)+(Math.random()-0.5)*0.8;
+            const speed=Math.random()*1.2+0.4;
+            return {x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
+                life:1,decay:Math.random()*0.008+0.003,r:Math.random()*1.5+0.5,
+                color:['#f59e0b','#fbbf24','#93c5fd','#38bdf8'][Math.floor(Math.random()*4)]};
+        }
+        function init() {
+            resize();
+            particles=Array.from({length:80},mkParticle);
+            gears=[mkGear(W*0.08,H*0.18,58,12,0.004,'#2563eb'),mkGear(W*0.92,H*0.80,72,14,-0.003,'#818cf8'),
+                   mkGear(W*0.88,H*0.12,44,10,0.006,'#38bdf8'),mkGear(W*0.12,H*0.85,50,10,-0.005,'#f59e0b'),
+                   mkGear(W*0.50,H*0.06,36,8,0.007,'#4ade80')];
+            sparks=Array.from({length:35},mkSpark);
+        }
+        function draw() {
+            ctx.clearRect(0,0,W,H);
+            gears.forEach(g=>{g.angle+=g.speed;drawGear(g);});
+            for(let i=0;i<particles.length;i++){
+                for(let j=i+1;j<particles.length;j++){
+                    const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y;
+                    const d=Math.sqrt(dx*dx+dy*dy);
+                    if(d<90){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);
+                        ctx.strokeStyle=`rgba(99,132,220,${0.12*(1-d/90)})`;ctx.lineWidth=0.7;ctx.stroke();}
+                }
+            }
+            particles.forEach(p=>{
+                p.x+=p.vx;p.y+=p.vy;
+                if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+                ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+                ctx.fillStyle=p.color;ctx.globalAlpha=p.alpha;ctx.fill();ctx.globalAlpha=1;
+            });
+            sparks.forEach((s,idx)=>{
+                s.x+=s.vx;s.y+=s.vy;s.life-=s.decay;
+                if(s.life<=0)sparks[idx]=mkSpark();
+                ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+                ctx.fillStyle=s.color;ctx.globalAlpha=s.life*0.75;ctx.fill();ctx.globalAlpha=1;
+            });
+            raf=requestAnimationFrame(draw);
+        }
+        function startHero(){if(!running){running=true;resize();draw();}}
+        function stopHero(){running=false;cancelAnimationFrame(raf);}
+        const obs=new IntersectionObserver(e=>e[0].isIntersecting?startHero():stopHero(),{threshold:0.3});
+        obs.observe(document.getElementById('s0'));
+        window.addEventListener('resize',resize);
+        init();startHero();
+    })();
+    </script>
+
+    <!-- ANIMACION CONCLUSION: Flujo de Particulas por Cadena de Valor -->
+    <script>
+    (function() {
+        const canvas = document.getElementById('chain-canvas');
+        const ctx = canvas.getContext('2d');
+        let W, H, fp, raf2, running = false;
+        function resize() {
+            const r=canvas.parentElement.getBoundingClientRect();
+            W=canvas.width=r.width;H=canvas.height=r.height;
+        }
+        function getNodes() {
+            const pr=canvas.parentElement.getBoundingClientRect();
+            return Array.from(document.querySelectorAll('.chain-node')).map(n=>{
+                const r=n.getBoundingClientRect();
+                return {cx:r.left-pr.left+r.width/2,cy:r.top-pr.top+r.height/2};
+            });
+        }
+        function mkFP() {
+            return {nodes:getNodes(),nodeIdx:0,progress:0,speed:Math.random()*0.008+0.004,
+                size:Math.random()*4+2,alpha:Math.random()*0.6+0.4,
+                color:['#2563eb','#f59e0b','#4ade80','#38bdf8','#818cf8'][Math.floor(Math.random()*5)],
+                delay:Math.floor(Math.random()*200)};
+        }
+        function initFlow(){resize();fp=Array.from({length:24},mkFP);}
+        function drawFlow() {
+            ctx.clearRect(0,0,W,H);
+            const pr=canvas.parentElement.getBoundingClientRect();
+            const t=performance.now()*0.001;
+            document.querySelectorAll('.chain-node').forEach((n,ni)=>{
+                const r=n.getBoundingClientRect();
+                const cx=r.left-pr.left+r.width/2,cy=r.top-pr.top+r.height/2;
+                const rad=Math.max(r.width,r.height)*0.58;
+                ctx.beginPath();ctx.arc(cx,cy,rad,0,Math.PI*2);
+                ctx.strokeStyle=['rgba(37,99,235,0.2)','rgba(129,140,248,0.2)','rgba(56,189,248,0.2)','rgba(245,158,11,0.2)'][ni]||'rgba(37,99,235,0.2)';
+                ctx.lineWidth=1.5;ctx.setLineDash([6,10]);ctx.lineDashOffset=-t*30;ctx.stroke();ctx.setLineDash([]);
+            });
+            fp.forEach((p,idx)=>{
+                if(p.delay>0){p.delay--;return;}
+                if(!p.nodes||p.nodes.length<2)return;
+                const from=p.nodes[p.nodeIdx],to=p.nodes[Math.min(p.nodeIdx+1,p.nodes.length-1)];
+                if(!from||!to)return;
+                p.progress+=p.speed;
+                if(p.progress>=1){p.progress=0;p.nodeIdx++;if(p.nodeIdx>=p.nodes.length-1){fp[idx]=mkFP();return;}}
+                const x=from.cx+(to.cx-from.cx)*p.progress,y=from.cy+(to.cy-from.cy)*p.progress;
+                const grad=ctx.createRadialGradient(x,y,0,x,y,p.size*4);
+                grad.addColorStop(0,p.color);grad.addColorStop(1,'transparent');
+                ctx.beginPath();ctx.arc(x,y,p.size*4,0,Math.PI*2);
+                ctx.fillStyle=grad;ctx.globalAlpha=p.alpha*0.25;ctx.fill();
+                ctx.beginPath();ctx.arc(x,y,p.size,0,Math.PI*2);
+                ctx.fillStyle=p.color;ctx.globalAlpha=p.alpha;ctx.fill();ctx.globalAlpha=1;
+            });
+            raf2=requestAnimationFrame(drawFlow);
+        }
+        function startChain(){if(!running){running=true;initFlow();drawFlow();}}
+        function stopChain(){running=false;cancelAnimationFrame(raf2);}
+        const obs2=new IntersectionObserver(e=>e[0].isIntersecting?startChain():stopChain(),{threshold:0.3});
+        obs2.observe(document.getElementById('s6'));
+        window.addEventListener('resize',()=>{if(running)resize();});
+    })();
     </script>
 </body>
 </html>
