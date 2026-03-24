@@ -638,8 +638,8 @@ function openModal(idx) {
     const pointsHTML = m.points.map((p, pi) =>
         `<li>
             <span class="mp-icon">${p.icon}</span>
-            <div class="mp-body"><strong>${p.title}</strong>${p.text}</div>
-            <button class="btn-detail" onclick="openSub(window._activeModal,${pi})"> Ver detalle</button>
+            <div class="mp-body"><strong>${p.title}</strong></div>
+            <button class="btn-detail" onclick="openSub(window._activeModal,${pi})">Ver &rsaquo;</button>
         </li>`
     ).join('');
     textPanel.innerHTML = `
@@ -654,29 +654,11 @@ function openModal(idx) {
 
 // -- SUB-MODAL LOGIC --
 function openSub(modalIdx, pointIdx) {
-    const m = modals[modalIdx];
-    const p = m.points[pointIdx];
+    const p = modals[modalIdx].points[pointIdx];
     document.getElementById('sm-icon').textContent  = p.icon;
     document.getElementById('sm-title').textContent = p.title;
-    const imgHTML = p.imgSrc
-        ? `<div class="sub-img-wrap has-img"><img src="" alt=""></div><p class="sub-caption"></p>`
-        : `<div class="sub-img-wrap">
-               <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-                   <rect x="2" y="2" width="48" height="48" rx="10" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="6 4"/>
-                   <rect x="14" y="16" width="24" height="16" rx="4" stroke="#06b6d4" stroke-width="1.5"/>
-                   <circle cx="19" cy="22" r="3" stroke="#84cc16" stroke-width="1.2"/>
-                   <path d="M14 32l8-8 5 5 5-7 6 10H14z" fill="#06b6d4" opacity=".25"/>
-               </svg>
-               <span style="color:rgba(6,182,212,.5);font-weight:700;">Imagen / Gráfica</span>
-               <span style="font-size:.75rem;"></span>
-           </div>
-           <p class="sub-caption"></p>`;
-    document.getElementById('sm-body').innerHTML = imgHTML + `
-        <p class="sub-desc"></p>
-        <div class="sub-note">
-           <strong style="color:var(--cyan2);">Para agregar tu imagen:</strong> en modals[].points[] agrega:<br>
-           <code>imgSrc: 'img/imagen.png', imgCaption: 'Descripcion', subDesc: 'Texto extendido'</code>
-        </div>`;
+    document.getElementById('sm-body').innerHTML = `
+        <p class="sub-desc">${p.text}</p>`;
     document.getElementById('sub-overlay').classList.add('open');
 }
 function closeSub() { document.getElementById('sub-overlay').classList.remove('open'); }
