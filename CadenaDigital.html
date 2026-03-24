@@ -143,6 +143,7 @@
 
         /* ── IMPACTO ── */
         .impact-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; width:100%; max-width:980px; margin-top:12px; }
+        .impact-grid-2 { grid-template-columns:repeat(2,1fr); max-width:860px; }
         .impact-card { padding:36px 28px; text-align:center; }
         .impact-icon { font-size:2.8rem; margin-bottom:16px; display:block; }
         .impact-card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; }
@@ -337,7 +338,7 @@
         .modal-points li .mp-body { flex:1; }
         /* RESPONSIVE */
         @media(max-width:768px) {
-            .pilares-grid,.impact-grid { grid-template-columns:1fr; }
+            .pilares-grid,.impact-grid,.impact-grid-2 { grid-template-columns:1fr; }
             #s0 .hero-layout { flex-direction:column; }
             .slide { padding:18px 18px 90px; }
             .modal-body { flex-direction:column; }
@@ -479,6 +480,48 @@
         </div>
     </section>
 
+    <!-- SLIDE 3: RESPALDO INTERNACIONAL -->
+    <section class="slide" id="s3">
+        <div style="width:100%;max-width:1100px;display:flex;flex-direction:column;align-items:center;text-align:center;">
+            <div class="anim tag">Integración Global</div>
+            <h2 class="anim d1 slide-title">Respaldo <span style="color:var(--cyan2);">Internacional</span></h2>
+            <p class="anim d1 slide-sub" style="max-width:800px;margin:0 auto 24px;">
+                EITI y Transparency International son aliados clave. ¿Cómo aceleran la implementación de nuestra cadena digital?
+            </p>
+            <div class="impact-grid impact-grid-2 anim d2" style="gap:30px;">
+                
+                <!-- CARD EITI -->
+                <div class="glass impact-card" style="text-align:left; padding:30px;">
+                    <div class="ic-bar ic-lime"></div>
+                    <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+                        <div style="width:60px;height:60px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:1.5rem;letter-spacing:-1px;">EITI</div>
+                        <h3 style="margin:0;">Estándar EITI</h3>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--cyan2); margin-bottom:12px; font-weight:700;">Iniciativa para la Transparencia de las Industrias Extractivas</p>
+                    <p style="margin-bottom:12px;"><strong>¿Qué hacen?</strong> Promueven la gestión abierta y responsable de los recursos petroleros, gasíferos y mineros a nivel mundial.</p>
+                    <p><strong>¿Cómo nos ayudan?</strong><br>
+                    Proveyendo el <em>marco metodológico de validación</em>. Nuestra tecnología blockchain automatiza lo que EITI exige: la conciliación exacta entre lo que las empresas extractivas <span style="color:var(--lime2);">declaran pagar</span> y lo que el Estado <span style="color:var(--cyan2);">registra haber recibido</span>, eliminando discrepancias financieras.</p>
+                    <a href="https://eiti.org/es/paises" target="_blank" style="display:inline-block; margin-top:16px; color:var(--text); text-decoration:none; font-size:0.8rem; border:1px solid rgba(255,255,255,0.2); padding:6px 16px; border-radius:20px; transition:0.2s;">🌐 Ver países EITI &rarr;</a>
+                </div>
+
+                <!-- CARD Transparency Int. -->
+                <div class="glass impact-card" style="text-align:left; padding:30px;">
+                    <div class="ic-bar ic-cyan"></div>
+                    <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+                        <div style="width:60px;height:60px;background:var(--cyan);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#000;">⚖️</div>
+                        <h3 style="margin:0;">Transparency Int.</h3>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--lime2); margin-bottom:12px; font-weight:700;">Transparency International</p>
+                    <p style="margin-bottom:12px;"><strong>¿Qué hacen?</strong> Lideran la lucha global contra la corrupción mediante el empoderamiento cívico y la medición de opacidad gubernamental.</p>
+                    <p><strong>¿Cómo nos ayudan?</strong><br>
+                    Estableciendo los <em>indicadores de riesgo y auditoría</em>. Usamos su conocimiento para alimentar la Inteligencia Artificial del Pilar 4, permitiendo detectar empresas fachada, conflictos de interés y evaluar el riesgo de corrupción real de los beneficiarios de manera precisa y sistémica.</p>
+                    <a href="https://www.transparency.org/" target="_blank" style="display:inline-block; margin-top:16px; color:var(--text); text-decoration:none; font-size:0.8rem; border:1px solid rgba(255,255,255,0.2); padding:6px 16px; border-radius:20px; transition:0.2s;">🌐 Conocer TI &rarr;</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
 </div><!-- /slide-wrapper -->
 
 <!-- PROGRESS BAR -->
@@ -493,6 +536,7 @@
     <div class="dot active" data-slide="0" title="Hero"></div>
     <div class="dot" data-slide="1" title="Pilares Tecnológicos"></div>
     <div class="dot" data-slide="2" title="Impacto y Beneficios"></div>
+    <div class="dot" data-slide="3" title="Respaldo Internacional"></div>
 </div>
 
 <!-- ═══════════════════════════════════════════
