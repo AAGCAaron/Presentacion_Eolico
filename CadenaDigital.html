@@ -231,6 +231,86 @@
         .mt-cyan { background:rgba(6,182,212,.12); border:1px solid rgba(6,182,212,.25); color:var(--cyan2); }
         .mt-lime { background:rgba(132,204,22,.12); border:1px solid rgba(132,204,22,.25); color:var(--lime2); }
 
+
+        /*  SUB-MODAL (detalle de punto)  */
+        .sub-overlay {
+            position:fixed; inset:0; z-index:999999;
+            background:rgba(2,4,14,.82); backdrop-filter:blur(22px);
+            display:flex; align-items:center; justify-content:center; padding:24px;
+            opacity:0; pointer-events:none;
+            transition:opacity .28s cubic-bezier(.4,0,.2,1);
+        }
+        .sub-overlay.open { opacity:1; pointer-events:all; }
+
+        .sub-box {
+            background:#060a20; border:1px solid rgba(6,182,212,.28);
+            border-radius:20px; width:100%; max-width:680px; max-height:82vh;
+            overflow:hidden; display:flex; flex-direction:column;
+            box-shadow:0 24px 70px rgba(0,0,0,.8), 0 0 0 1px rgba(6,182,212,.12);
+            transform:scale(.94) translateY(16px);
+            transition:transform .32s cubic-bezier(.4,0,.2,1);
+        }
+        .sub-overlay.open .sub-box { transform:scale(1) translateY(0); }
+
+        .sub-header {
+            display:flex; align-items:center; gap:12px; padding:16px 22px;
+            border-bottom:1px solid rgba(255,255,255,.07);
+            background:rgba(6,182,212,.07);
+        }
+        .sub-header .sh-icon {
+            width:40px; height:40px; border-radius:10px; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center; font-size:1.3rem;
+            background:rgba(6,182,212,.15); border:1px solid rgba(6,182,212,.25);
+        }
+        .sub-header .sh-title { flex:1; font-size:1.05rem; font-weight:800; }
+        .sub-header .sh-back {
+            all:unset; cursor:pointer; font-size:.8rem; font-weight:600; color:var(--muted);
+            display:flex; align-items:center; gap:5px; padding:6px 14px;
+            border:1px solid rgba(255,255,255,.1); border-radius:20px;
+            transition:all .2s; margin-right:6px;
+        }
+        .sub-header .sh-back:hover { color:#fff; border-color:var(--cyan); background:rgba(6,182,212,.12); }
+        .sub-close {
+            all:unset; cursor:pointer; width:32px; height:32px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center; font-size:1rem;
+            background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09);
+            color:#666; transition:all .2s;
+        }
+        .sub-close:hover { background:rgba(239,68,68,.18); border-color:rgba(239,68,68,.4); color:#fff; }
+
+        .sub-body { overflow-y:auto; padding:22px 24px; display:flex; flex-direction:column; gap:18px; }
+
+        .sub-img-wrap {
+            width:100%; border-radius:14px; overflow:hidden;
+            border:1.5px dashed rgba(6,182,212,.3);
+            background:linear-gradient(135deg,rgba(6,182,212,.05),rgba(132,204,22,.03));
+            min-height:180px; display:flex; flex-direction:column;
+            align-items:center; justify-content:center; gap:10px;
+            color:var(--muted); font-size:.82rem; text-align:center; padding:20px;
+        }
+        .sub-img-wrap img { width:100%; height:100%; object-fit:contain; display:block; }
+        .sub-img-wrap.has-img { border-style:solid; border-color:rgba(6,182,212,.2); min-height:auto; }
+        .sub-img-wrap svg { opacity:.28; }
+        .sub-caption { font-size:.7rem; color:rgba(255,255,255,.22); text-align:center; font-style:italic; }
+        .sub-desc { font-size:.9rem; color:var(--muted); line-height:1.78; }
+        .sub-note {
+            font-size:.75rem; color:rgba(6,182,212,.55); padding:10px 14px;
+            border:1px dashed rgba(6,182,212,.22); border-radius:10px;
+            background:rgba(6,182,212,.04);
+        }
+
+        /* Botón "Ver detalle" dentro de cada punto del modal principal */
+        .btn-detail {
+            all:unset; cursor:pointer; margin-left:auto; flex-shrink:0;
+            display:inline-flex; align-items:center; gap:4px;
+            font-size:.72rem; font-weight:700; color:var(--cyan); letter-spacing:.5px;
+            padding:4px 12px; border-radius:20px;
+            border:1px solid rgba(6,182,212,.28); background:rgba(6,182,212,.07);
+            transition:all .2s; white-space:nowrap;
+        }
+        .btn-detail:hover { background:rgba(6,182,212,.18); border-color:var(--cyan); color:#fff; }
+        .modal-points li { flex-wrap:wrap; }
+        .modal-points li .mp-body { flex:1; }
         /* RESPONSIVE */
         @media(max-width:768px) {
             .pilares-grid,.impact-grid { grid-template-columns:1fr; }
@@ -427,6 +507,21 @@
     </div>
 </div>
 
+
+<!--  SUB-MODAL (detalle de imagen + info)  -->
+<div class="sub-overlay" id="sub-overlay" onclick="closeSubOutside(event)">
+    <div class="sub-box">
+        <div class="sub-header">
+            <div class="sh-icon" id="sm-icon"></div>
+            <div class="sh-title" id="sm-title">Detalle</div>
+            <button class="sh-back" onclick="closeSub()"> Volver</button>
+            <button class="sub-close" onclick="closeSub()" title="Cerrar"></button>
+        </div>
+        <div class="sub-body" id="sm-body">
+            <!-- contenido inyectado por JS -->
+        </div>
+    </div>
+</div>
 <script>
 // ── DATOS DE CADA MODAL ──
 // Para agregar tu imagen: cambia imageSrc por la ruta real, e.g. "img/blockchain_diagram.png"
@@ -509,6 +604,7 @@ const modals = [
 function openModal(idx) {
     const m = modals[idx];
     const overlay = document.getElementById('modal-overlay');
+    window._activeModal = idx;  // asignar primero
 
     // Header
     document.getElementById('m-icon').innerHTML = m.iconSrc
@@ -539,17 +635,52 @@ function openModal(idx) {
     // Panel texto
     const textPanel = document.getElementById('m-text-panel');
     const tagsHTML  = m.tags.map(t => `<span class="modal-tag ${t.cls}">${t.label}</span>`).join('');
-    const pointsHTML = m.points.map(p =>
-        `<li><span class="mp-icon">${p.icon}</span><div><strong>${p.title}</strong>${p.text}</div></li>`
+    const pointsHTML = m.points.map((p, pi) =>
+        `<li>
+            <span class="mp-icon">${p.icon}</span>
+            <div class="mp-body"><strong>${p.title}</strong>${p.text}</div>
+            <button class="btn-detail" onclick="openSub(window._activeModal,${pi})"> Ver detalle</button>
+        </li>`
     ).join('');
     textPanel.innerHTML = `
         <div style="display:flex;gap:8px;flex-wrap:wrap;">${tagsHTML}</div>
         <p class="modal-desc">${m.desc}</p>
         <ul class="modal-points">${pointsHTML}</ul>`;
 
+    window._activeModal = idx;
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
 }
+
+// -- SUB-MODAL LOGIC --
+function openSub(modalIdx, pointIdx) {
+    const m = modals[modalIdx];
+    const p = m.points[pointIdx];
+    document.getElementById('sm-icon').textContent  = p.icon;
+    document.getElementById('sm-title').textContent = p.title;
+    const imgHTML = p.imgSrc
+        ? `<div class="sub-img-wrap has-img"><img src="" alt=""></div><p class="sub-caption"></p>`
+        : `<div class="sub-img-wrap">
+               <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+                   <rect x="2" y="2" width="48" height="48" rx="10" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="6 4"/>
+                   <rect x="14" y="16" width="24" height="16" rx="4" stroke="#06b6d4" stroke-width="1.5"/>
+                   <circle cx="19" cy="22" r="3" stroke="#84cc16" stroke-width="1.2"/>
+                   <path d="M14 32l8-8 5 5 5-7 6 10H14z" fill="#06b6d4" opacity=".25"/>
+               </svg>
+               <span style="color:rgba(6,182,212,.5);font-weight:700;">Imagen / Gráfica</span>
+               <span style="font-size:.75rem;"></span>
+           </div>
+           <p class="sub-caption"></p>`;
+    document.getElementById('sm-body').innerHTML = imgHTML + `
+        <p class="sub-desc"></p>
+        <div class="sub-note">
+           <strong style="color:var(--cyan2);">Para agregar tu imagen:</strong> en modals[].points[] agrega:<br>
+           <code>imgSrc: 'img/imagen.png', imgCaption: 'Descripcion', subDesc: 'Texto extendido'</code>
+        </div>`;
+    document.getElementById('sub-overlay').classList.add('open');
+}
+function closeSub() { document.getElementById('sub-overlay').classList.remove('open'); }
+function closeSubOutside(e) { if(e.target===document.getElementById('sub-overlay')) closeSub(); }
 
 function closeModal() {
     document.getElementById('modal-overlay').classList.remove('open');
@@ -558,7 +689,12 @@ function closeModal() {
 function closeModalOutside(e) {
     if (e.target === document.getElementById('modal-overlay')) closeModal();
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        if (document.getElementById('sub-overlay').classList.contains('open')) { closeSub(); return; }
+        closeModal();
+    }
+});
 
 // ── SLIDE ENGINE ──
 const slides   = Array.from(document.querySelectorAll('.slide'));
