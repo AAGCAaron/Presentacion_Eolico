@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformación Digital – Cadena de Suministro | Equipo 3 RyNM</title>
+    <meta name="description" content="Propuesta tecnológica para la modernización de la cadena de suministro nacional en hidrocarburos y minería: Blockchain, Smart Contracts, IoT e IA.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:     #040610;
+            --navy:   #07091c;
+            --glass:  rgba(255,255,255,0.04);
+            --border: rgba(255,255,255,0.09);
+            --cyan:   #06b6d4;
+            --cyan2:  #22d3ee;
+            --lime:   #84cc16;
+            --lime2:  #a3e635;
+            --text:   #f1f5f9;
+            --muted:  #94a3b8;
+            --font:   'Outfit', sans-serif;
+        }
+
+        html { font-size: 16px; }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); overflow: hidden; min-height: 100vh; }
+
+        #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+        /* ── NAV BAR ── */
+        #top-navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+            display: flex; align-items: center; gap: 6px;
+            padding: 10px 24px;
+            background: rgba(4,6,16,0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(6,182,212,0.12);
+            box-shadow: 0 2px 24px rgba(0,0,0,0.6);
+        }
+        #top-navbar .brand {
+            font-size: 13px; font-weight: 800; color: var(--cyan);
+            letter-spacing: 1px; text-transform: uppercase; margin-right: 12px;
+        }
+        #top-navbar a {
+            text-decoration: none; color: #9ca3af; font-size: 13px; font-weight: 500;
+            padding: 6px 16px; border-radius: 20px;
+            transition: all .25s; border: 1px solid transparent;
+        }
+        #top-navbar a:hover { color: #fff; background: rgba(6,182,212,.2); border-color: rgba(6,182,212,.4); }
+        #top-navbar a.active-tab { color: #fff; background: rgba(6,182,212,.28); border-color: rgba(6,182,212,.55); }
+
+        /* ── SLIDE ENGINE ── */
+        .slide-wrapper { position: fixed; top: 50px; left: 0; right: 0; bottom: 0; overflow: hidden; z-index: 1; }
+
+        .slide {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            padding: 32px 60px 80px 32px;
+            opacity: 0;
+            transform: translateX(80px) scale(0.97);
+            transition: opacity .55s cubic-bezier(.4,0,.2,1), transform .55s cubic-bezier(.4,0,.2,1);
+            pointer-events: none;
+        }
+        .slide.active  { opacity: 1; transform: translateX(0) scale(1); pointer-events: all; }
+        .slide.exit-left  { opacity: 0; transform: translateX(-80px) scale(0.97); }
+        .slide.exit-right { opacity: 0; transform: translateX(80px) scale(0.97); }
+
+        /* ── PROGRESS BAR ── */
+        #progress-bar {
+            position: fixed; bottom: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--lime));
+            transition: width .45s ease; z-index: 9999;
+            border-radius: 0 3px 3px 0;
+        }
+
+        /* ── NAV BUTTONS ── */
+        .nav-btn {
+            position: fixed; bottom: 24px; z-index: 9999;
+            background: var(--glass); border: 1px solid var(--border);
+            color: #fff; padding: 10px 28px; border-radius: 30px;
+            font-family: var(--font); font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all .25s;
+            backdrop-filter: blur(10px);
+        }
+        .nav-btn:hover { background: rgba(6,182,212,.2); border-color: var(--cyan); box-shadow: 0 0 20px rgba(6,182,212,.2); }
+        #btn-prev { left: 50%; transform: translateX(-140px); }
+        #btn-next { left: 50%; transform: translateX(20px); }
+
+        /* ── DOTS ── */
+        #slide-counter { position: fixed; bottom: 64px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 9999; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2); transition: all .35s; cursor: pointer; }
+        .dot.active { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 12px rgba(6,182,212,.5); transform: scale(1.25); }
+
+        /* ── GLASS CARD ── */
+        .glass {
+            background: var(--glass); backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+            transition: transform .3s, border-color .3s, box-shadow .3s;
+        }
+        .glass:hover { transform: translateY(-4px); border-color: rgba(6,182,212,.25); box-shadow: 0 12px 40px rgba(6,182,212,.12); }
+
+        /* ── TYPOGRAPHY ── */
+        .tag {
+            display: inline-block; font-size: 11px; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); margin-bottom: 8px;
+        }
+        .slide-title { font-size: clamp(1.9rem, 4.5vw, 3.2rem); font-weight: 800; line-height: 1.15; margin-bottom: 10px; }
+        .slide-sub   { font-size: 1rem; color: var(--muted); max-width: 620px; line-height: 1.7; margin-bottom: 24px; }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+        .anim { opacity: 0; }
+        .slide.active .anim { animation: fadeUp .55s ease forwards; }
+        .slide.active .anim.d1 { animation-delay: .1s; }
+        .slide.active .anim.d2 { animation-delay: .22s; }
+        .slide.active .anim.d3 { animation-delay: .35s; }
+        .slide.active .anim.d4 { animation-delay: .48s; }
+        .slide.active .anim.d5 { animation-delay: .60s; }
+
+        /* ── SLIDE 0: HERO ── */
+        #s0 .hero-layout { display: flex; gap: 40px; align-items: center; width: 100%; max-width: 1100px; }
+        #s0 .hero-text   { flex: 1; }
+        #s0 .hero-img-wrap {
+            flex: 1; max-width: 520px;
+            border-radius: 18px; overflow: hidden;
+            border: 1px solid rgba(6,182,212,.2);
+            box-shadow: 0 0 60px rgba(6,182,212,.15);
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, rgba(6,182,212,.08), rgba(132,204,22,.05));
+            display: flex; align-items: center; justify-content: center;
+        }
+        #s0 .hero-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(6,182,212,.1); border: 1px solid rgba(6,182,212,.3);
+            border-radius: 50px; padding: 5px 18px;
+            font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+            color: var(--cyan2); text-transform: uppercase; margin-bottom: 20px;
+        }
+        .pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+
+        .hero-title {
+            font-size: clamp(2rem, 4.5vw, 3.4rem); font-weight: 800; line-height: 1.1;
+            background: linear-gradient(135deg, #e2e8f0 0%, var(--cyan2) 50%, var(--lime2) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 18px;
+        }
+        .hero-sub { font-size: 1rem; color: var(--muted); line-height: 1.7; margin-bottom: 28px; max-width: 520px; }
+        .hero-stats { display: flex; gap: 32px; }
+        .hstat .n { font-size: 2rem; font-weight: 800; color: var(--lime); display: block; }
+        .hstat .l { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── SLIDE 1: PILARES (4 tarjetas 2x2) ── */
+        .pilares-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; width: 100%; max-width: 1040px; }
+        .pilar-card { display: flex; gap: 20px; padding: 28px 24px; align-items: flex-start; }
+        .pilar-icon-wrap {
+            width: 72px; height: 72px; flex-shrink: 0;
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            /* Placeholder  para imagen de icono */
+            background: linear-gradient(135deg, rgba(6,182,212,.18), rgba(132,204,22,.10));
+            border: 1px solid rgba(6,182,212,.2);
+            overflow: hidden;
+            font-size: 2.2rem;
+        }
+        .pilar-icon-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
+        .pilar-body h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+        .pilar-body p  { font-size: .85rem; color: var(--muted); line-height: 1.65; }
+        .pilar-num {
+            font-size: .68rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--cyan); margin-bottom: 6px; display: block;
+        }
+        .pc-1 { border-top: 2px solid var(--cyan); }
+        .pc-2 { border-top: 2px solid var(--lime); }
+        .pc-3 { border-top: 2px solid rgba(6,182,212,.5); }
+        .pc-4 { border-top: 2px solid rgba(132,204,22,.5); }
+
+        /* ── SLIDE 2: IMPACTO ── */
+        .impact-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; width: 100%; max-width: 980px; margin-top: 12px; }
+        .impact-card { padding: 36px 28px; text-align: center; }
+        .impact-icon { font-size: 2.8rem; margin-bottom: 16px; display: block; }
+        .impact-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+        .impact-card p  { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+        .ic-bar { height: 3px; border-radius: 3px; margin: 0 auto 22px; width: 50px; }
+        .ic-cyan { background: linear-gradient(90deg, var(--cyan), var(--cyan2)); }
+        .ic-lime { background: linear-gradient(90deg, var(--lime), var(--lime2)); }
+        .ic-mix  { background: linear-gradient(90deg, var(--cyan), var(--lime)); }
+
+        /* ── SLIDE 3: CTA ── */
+        #s3 { text-align: center; }
+        #s3 .slide-inner { align-items: center; }
+        .cta-box {
+            max-width: 700px; padding: 56px 60px; text-align: center;
+            background: rgba(6,182,212,.04); border: 1px solid rgba(6,182,212,.18);
+            border-radius: 24px; backdrop-filter: blur(12px);
+        }
+        .cta-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 14px;
+            background: linear-gradient(135deg, #e2e8f0, var(--cyan2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .cta-sub { font-size: 1rem; color: var(--muted); line-height: 1.7; margin-bottom: 32px; }
+        .btn-cta {
+            display: inline-block; padding: 16px 44px;
+            background: linear-gradient(135deg, var(--cyan), var(--lime));
+            border-radius: 50px; font-weight: 800; font-size: 1.05rem; color: #030712;
+            text-decoration: none; transition: all .3s;
+            box-shadow: 0 8px 32px rgba(6,182,212,.3);
+        }
+        .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(6,182,212,.45); }
+        .ref-links { margin-top: 28px; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+        .ref-link {
+            font-size: .82rem; color: var(--muted); text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,.15); padding-bottom: 2px;
+            transition: color .2s, border-color .2s;
+        }
+        .ref-link:hover { color: var(--cyan2); border-color: var(--cyan2); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .pilares-grid, .impact-grid { grid-template-columns: 1fr; }
+            #s0 .hero-layout { flex-direction: column; }
+            .slide { padding: 20px 20px 90px; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- ── NAV BAR ── -->
+<div id="top-navbar">
+    <span class="brand">⚡ Equipo 3 RyNM</span>
+    <a href="index.html">🖥️ Presentación</a>
+    <a href="MapaConceptual_Indicadores.html">🗺️ Mapa Conceptual</a>
+    <a href="Crucigrama_Indicadores.html">🧩 Crucigrama</a>
+    <a href="MexicoEnElMundo.html">🌎 México en el Mundo</a>
+    <a href="EmpresasSecundarias.html">🏭 Sector Secundario</a>
+    <a href="CadenaDigital.html" class="active-tab">🔗 Cadena Digital</a>
+</div>
+
+<!-- ── SLIDES ── -->
+<div class="slide-wrapper">
+
+    <!-- ▸ SLIDE 0 — HERO ▸ -->
+    <section class="slide active" id="s0">
+        <div id="s0-inner" style="width:100%;max-width:1140px;">
+            <div class="hero-layout">
+                <div class="hero-text">
+                    <div class="hero-badge anim"><span class="pulse-dot"></span>Propuesta Tecnológica · 2026</div>
+                    <h1 class="hero-title anim d1">
+                        Hacia un ecosistema extractivo<br>
+                        <span style="color:var(--lime2);">inmutable, eficiente</span><br>
+                        y transparente.
+                    </h1>
+                    <p class="hero-sub anim d2">
+                        Propuesta tecnológica para la modernización de la cadena de suministro
+                        nacional en <strong style="color:var(--cyan2);">Hidrocarburos y Minería</strong>.
+                    </p>
+                    <div class="hero-stats anim d3">
+                        <div class="hstat"><span class="n">4</span><span class="l">Pilares Tecnológicos</span></div>
+                        <div class="hstat"><span class="n">3</span><span class="l">Beneficios Clave</span></div>
+                        <div class="hstat"><span class="n" style="color:var(--cyan);">100%</span><span class="l">Trazable</span></div>
+                    </div>
+                </div>
+
+                <!-- IMAGEN HERO — reemplazar src con imagen propia -->
+                <div class="hero-img-wrap anim d2">
+                    <img src="img/cadena_digital_hero.png" alt="Cadena de Suministro Digital — Visualización futurista de red blockchain y datos">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ▸ SLIDE 1 — PILARES TECNOLÓGICOS ▸ -->
+    <section class="slide" id="s1">
+        <div style="width:100%;max-width:1100px;display:flex;flex-direction:column;align-items:flex-start;">
+            <div class="anim tag">Los 4 Pilares Tecnológicos</div>
+            <h2 class="anim d1 slide-title">Arquitectura de <span style="color:var(--cyan2);">Transparencia Digital</span></h2>
+            <p class="anim d1 slide-sub">Tecnologías que eliminan el factor humano en procesos críticos de la cadena extractiva.</p>
+
+            <div class="pilares-grid anim d2">
+
+                <!-- TARJETA 1: BLOCKCHAIN -->
+                <div class="glass pilar-card pc-1">
+                    <!-- ESPACIO PARA IMAGEN/ICONO — reemplazar emoji por <img src="img/icon_blockchain.png"> -->
+                    <div class="pilar-icon-wrap">⛓️</div>
+                    <div class="pilar-body">
+                        <span class="pilar-num">Pilar 01</span>
+                        <h3>Trazabilidad con Blockchain</h3>
+                        <p>Registro inmutable de transacciones físicas y financieras. Rastreo del recurso desde la boca de mina/pozo hasta la exportación, asegurando el origen lícito y evitando el lavado de minerales.</p>
+                    </div>
+                </div>
+
+                <!-- TARJETA 2: SMART CONTRACTS -->
+                <div class="glass pilar-card pc-2">
+                    <!-- ESPACIO PARA IMAGEN/ICONO — reemplazar emoji por <img src="img/icon_smcontract.png"> -->
+                    <div class="pilar-icon-wrap">🤝</div>
+                    <div class="pilar-body">
+                        <span class="pilar-num" style="color:var(--lime);">Pilar 02</span>
+                        <h3>Contratos Inteligentes</h3>
+                        <p>Automatización de pagos de regalías y cumplimiento de licencias. La liberación de fondos se activa solo cuando se cumplen las condiciones socio-ambientales y fiscales verificadas digitalmente.</p>
+                    </div>
+                </div>
+
+                <!-- TARJETA 3: IoT + SATELITAL -->
+                <div class="glass pilar-card pc-3">
+                    <!-- ESPACIO PARA IMAGEN/ICONO — reemplazar emoji por <img src="img/icon_iot.png"> -->
+                    <div class="pilar-icon-wrap">🛰️</div>
+                    <div class="pilar-body">
+                        <span class="pilar-num">Pilar 03</span>
+                        <h3>IoT y Monitoreo Satelital</h3>
+                        <p>Vigilancia en tiempo real de la actividad extractiva. Sensores IoT detectan desvíos de material, derrames y actividad no autorizada en concesiones suspendidas.</p>
+                    </div>
+                </div>
+
+                <!-- TARJETA 4: IA -->
+                <div class="glass pilar-card pc-4">
+                    <!-- ESPACIO PARA IMAGEN/ICONO — reemplazar emoji por <img src="img/icon_ia.png"> -->
+                    <div class="pilar-icon-wrap">🧠</div>
+                    <div class="pilar-body">
+                        <span class="pilar-num" style="color:var(--lime);">Pilar 04</span>
+                        <h3>IA para Beneficiarios Reales</h3>
+                        <p>Plataforma de IA que cruza datos de registros públicos y facturación para mapear estructuras de propiedad, detectando conflictos de interés y empresas fantasma en la red de proveedores.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ▸ SLIDE 2 — IMPACTO Y BENEFICIOS ▸ -->
+    <section class="slide" id="s2">
+        <div style="width:100%;max-width:1040px;display:flex;flex-direction:column;align-items:center;text-align:center;">
+            <div class="anim tag">Impacto y Beneficios</div>
+            <h2 class="anim d1 slide-title">¿Por qué <span style="color:var(--lime2);">importa</span> ahora?</h2>
+            <p class="anim d1 slide-sub" style="text-align:center;margin:0 auto 8px;">
+                La adopción de estas tecnologías transforma radicalmente la relación entre el Estado, la industria y la sociedad.
+            </p>
+
+            <div class="impact-grid anim d2">
+
+                <div class="glass impact-card">
+                    <div class="ic-bar ic-cyan"></div>
+                    <!-- ESPACIO PARA IMAGEN — reemplazar emoji por <img src="img/impact_eficiencia.png" style="height:64px;"> -->
+                    <span class="impact-icon">⚡</span>
+                    <h3>Optimización Operativa</h3>
+                    <p>Menores costos de auditoría y logística mediante automatización de procesos críticos. Menos papeles, menos intermediarios, más velocidad.</p>
+                </div>
+
+                <div class="glass impact-card">
+                    <div class="ic-bar ic-mix"></div>
+                    <!-- ESPACIO PARA IMAGEN — reemplazar emoji por <img src="img/impact_corrupcion.png" style="height:64px;"> -->
+                    <span class="impact-icon">🛡️</span>
+                    <h3>Reducción de la Corrupción</h3>
+                    <p>Eliminación del factor humano discrecional en procesos fiscales y de licencias. Los contratos se ejecutan solos, sin margen de manipulación.</p>
+                </div>
+
+                <div class="glass impact-card">
+                    <div class="ic-bar ic-lime"></div>
+                    <!-- ESPACIO PARA IMAGEN — reemplazar emoji por <img src="img/impact_confianza.png" style="height:64px;"> -->
+                    <span class="impact-icon">📈</span>
+                    <h3>Mayor Confianza del Inversor</h3>
+                    <p>Estándares de transparencia de clase mundial, alineados con <strong style="color:var(--cyan2);">EITI</strong> y <strong style="color:var(--lime2);">Transparency International</strong>. Señal clara para inversión extranjera.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ▸ SLIDE 3 — CTA / FOOTER ▸ -->
+    <section class="slide" id="s3">
+        <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="cta-box">
+                <div class="anim tag" style="color:var(--lime);">Próximo Paso</div>
+                <h2 class="anim d1 cta-title">¿Listo para la<br>transformación?</h2>
+                <p class="anim d2 cta-sub">
+                    Implementar estos pilares tecnológicos no es un lujo —
+                    es la única vía para garantizar una cadena de suministro
+                    soberana, eficiente y libre de corrupción.
+                </p>
+                <a class="btn-cta anim d3" href="mailto:equipo3@rynm.mx">
+                    Solicitar Demo de la Plataforma
+                </a>
+                <div class="ref-links anim d4">
+                    <span style="font-size:.75rem;color:rgba(255,255,255,.3);">Marcos de referencia:</span>
+                    <a class="ref-link" href="https://eiti.org" target="_blank" rel="noopener">↗ EITI</a>
+                    <a class="ref-link" href="https://www.transparency.org" target="_blank" rel="noopener">↗ Transparency International</a>
+                    <a class="ref-link" href="https://www.gob.mx/sener" target="_blank" rel="noopener">↗ SENER México</a>
+                </div>
+            </div>
+            <p class="anim d5" style="margin-top:24px;font-size:.72rem;color:rgba(255,255,255,.15);">⚡ Equipo 3 RyNM · 2026</p>
+        </div>
+    </section>
+
+</div><!-- /slide-wrapper -->
+
+<!-- ── PROGRESS BAR ── -->
+<div id="progress-bar" style="width:25%;"></div>
+
+<!-- ── NAV BUTTONS ── -->
+<button class="nav-btn" id="btn-prev">← Anterior</button>
+<button class="nav-btn" id="btn-next">Siguiente →</button>
+
+<!-- ── DOT NAVIGATION ── -->
+<div id="slide-counter">
+    <div class="dot active" data-slide="0" title="Hero"></div>
+    <div class="dot" data-slide="1" title="Pilares Tecnológicos"></div>
+    <div class="dot" data-slide="2" title="Impacto y Beneficios"></div>
+    <div class="dot" data-slide="3" title="CTA"></div>
+</div>
+
+<script>
+    // ── SLIDE ENGINE ──
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dots   = Array.from(document.querySelectorAll('.dot'));
+    const bar    = document.getElementById('progress-bar');
+    let current  = 0;
+    let animating = false;
+
+    function goTo(idx) {
+        if (idx === current || animating) return;
+        animating = true;
+        const dir = idx > current ? 'left' : 'right';
+        slides[current].classList.add(dir === 'left' ? 'exit-left' : 'exit-right');
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        current = idx;
+        slides[current].classList.add('active');
+        slides[current].classList.remove('exit-left', 'exit-right');
+        dots[current].classList.add('active');
+        bar.style.width = `${(current + 1) / slides.length * 100}%`;
+        setTimeout(() => {
+            slides.forEach(s => s.classList.remove('exit-left', 'exit-right'));
+            animating = false;
+        }, 600);
+    }
+
+    document.getElementById('btn-prev').addEventListener('click', () => goTo(Math.max(0, current - 1)));
+    document.getElementById('btn-next').addEventListener('click', () => goTo(Math.min(slides.length - 1, current + 1)));
+    dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.slide)));
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') goTo(Math.min(slides.length-1, current+1));
+        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp'   || e.key === 'PageUp')   goTo(Math.max(0, current-1));
+    });
+
+    // ── BACKGROUND CANVAS: Digital Network ──
+    (function() {
+        const cv  = document.getElementById('bg-canvas');
+        const ctx = cv.getContext('2d');
+        let W, H, nodes, raf;
+
+        function resize() { W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+
+        function mkNode() {
+            return {
+                x: Math.random() * W, y: Math.random() * H,
+                vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
+                r: Math.random() * 2 + 1,
+                color: Math.random() > 0.5 ? '#06b6d4' : '#84cc16',
+                alpha: Math.random() * 0.55 + 0.1,
+                pulse: Math.random() * Math.PI * 2
+            };
+        }
+
+        function init() { resize(); nodes = Array.from({ length: 70 }, mkNode); }
+
+        function frame() {
+            ctx.clearRect(0, 0, W, H);
+            // Subtle grid
+            ctx.strokeStyle = 'rgba(6,182,212,0.03)'; ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+            // Lines between close nodes
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+                    const d  = Math.sqrt(dx * dx + dy * dy);
+                    if (d < 110) {
+                        ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.strokeStyle = `rgba(6,182,212,${0.1 * (1 - d / 110)})`; ctx.lineWidth = 0.8; ctx.stroke();
+                    }
+                }
+            }
+
+            // Nodes
+            nodes.forEach(n => {
+                n.x += n.vx; n.y += n.vy;
+                if (n.x < 0) n.x = W; if (n.x > W) n.x = 0;
+                if (n.y < 0) n.y = H; if (n.y > H) n.y = 0;
+                n.pulse += 0.03;
+                const pr = n.r * (1 + Math.sin(n.pulse) * 0.35);
+                ctx.save();
+                ctx.shadowColor = n.color; ctx.shadowBlur = 10;
+                ctx.beginPath(); ctx.arc(n.x, n.y, pr, 0, Math.PI * 2);
+                ctx.fillStyle = n.color; ctx.globalAlpha = n.alpha; ctx.fill();
+                ctx.restore(); ctx.globalAlpha = 1;
+            });
+
+            raf = requestAnimationFrame(frame);
+        }
+
+        window.addEventListener('resize', resize);
+        init(); frame();
+    })();
+</script>
+
+</body>
+</html>
