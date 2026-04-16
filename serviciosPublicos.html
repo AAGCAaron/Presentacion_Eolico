@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios Públicos - Tecnologías y Soluciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --vino: #691C32;
+            --vino-light: #9F2241;
+            --dorado: #D4C19C;
+            --dorado-dark: #BC955C;
+            --esmeralda: #10B981;
+            --bg: #F8FAFC;
+            --text: #1E293B;
+            --muted: #64748B;
+            --card: #FFFFFF;
+            --border: #E2E8F0;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        body { background:var(--bg); color:var(--text); overflow:hidden; height:100vh; }
+        
+        #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+        /* ── NAVBAR ── */
+        #top-navbar {
+            position:fixed; top:0; left:0; right:0; z-index:100;
+            display:flex; gap:12px; padding:12px 24px;
+            background:var(--vino); color:white;
+            align-items:center; overflow-x:auto; white-space:nowrap;
+            box-shadow:0 4px 15px rgba(0,0,0,0.1);
+        }
+        #top-navbar::-webkit-scrollbar { height:4px; }
+        #top-navbar::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:4px; }
+        .brand { font-weight:900; margin-right:20px; font-size:1.1rem; color:var(--dorado); }
+        #top-navbar a { color:rgba(255,255,255,0.7); text-decoration:none; font-size:.85rem; font-weight:600; padding:8px 14px; border-radius:8px; transition:0.2s; }
+        #top-navbar a:hover { background:rgba(255,255,255,0.1); color:#fff; }
+        #top-navbar a.active-tab { background:var(--dorado-dark); color:#fff; }
+
+        /* ── ESTRUCTURA SLIDES ── */
+        .slide-wrapper { position:relative; width:100%; height:100vh; z-index:2; overflow:hidden; }
+        .slide {
+            position:absolute; inset:0; padding:90px 40px 60px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            opacity:0; transform:translateX(50px); pointer-events:none;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y:auto;
+        }
+        .slide.active { opacity:1; transform:translateX(0); pointer-events:all; }
+        .slide.exit-left { transform:translateX(-50px); opacity:0; }
+        .slide.exit-right { transform:translateX(50px); opacity:0; }
+
+        /* ── ANIMACIONES INTERNAS ── */
+        .anim { opacity:0; transform:translateY(20px); transition:all 0.6s cubic-bezier(0.4,0,0.2,1); }
+        .slide.active .anim { opacity:1; transform:translateY(0); }
+        .d1 { transition-delay:0.15s; }
+        .d2 { transition-delay:0.3s; }
+        .d3 { transition-delay:0.45s; }
+
+        /* ── TIPOGRAFIA & ETIQUETAS ── */
+        .tag {
+            display:inline-block; padding:6px 16px; border-radius:20px;
+            font-size:.75rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;
+            background:rgba(105, 28, 50, 0.1); border:1px solid rgba(105, 28, 50, 0.2); color:var(--vino);
+            margin-bottom:16px;
+        }
+        .slide-title { font-size:3rem; font-weight:900; line-height:1.1; margin-bottom:16px; color:var(--vino); }
+        .slide-sub { font-size:1.1rem; color:var(--muted); line-height:1.6; max-width:800px; text-align:center; }
+
+        /* ── HERO ── */
+        .hero-layout { display:flex; align-items:center; gap:50px; max-width:1100px; width:100%; }
+        .hero-text { flex:1; }
+        .hero-img { flex:1; display:flex; justify-content:center; }
+        .hero-img-box {
+            width:100%; aspect-ratio:4/3; border-radius:24px;
+            background:var(--card); border:2px dashed var(--dorado);
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            color:var(--dorado-dark); text-align:center; padding:20px;
+            box-shadow:0 20px 40px rgba(105, 28, 50, 0.05);
+            position:relative; overflow:hidden;
+        }
+
+        /* ── TARJETAS (Fallas / Impacto) ── */
+        .grid-4 { display:grid; grid-template-columns:repeat(2, 1fr); gap:20px; max-width:960px; width:100%; margin-top:30px; }
+        .grid-3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:24px; max-width:1000px; width:100%; margin-top:30px; }
+        .card {
+            background:var(--card); padding:30px; border-radius:20px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.03); border:1px solid var(--border);
+            text-align:left; transition:all 0.3s; position:relative; overflow:hidden;
+        }
+        .card:hover { transform:translateY(-5px); box-shadow:0 15px 40px rgba(105, 28, 50, 0.08); border-color:var(--vino-light); }
+        .card-icon { font-size:2.5rem; margin-bottom:15px; display:block; }
+        .card h3 { font-size:1.2rem; color:var(--vino); margin-bottom:10px; }
+        .card p { font-size:0.9rem; color:var(--muted); line-height:1.6; }
+
+        /* ── BOTONES PILARES ── */
+        .pilares-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:24px; max-width:1060px; width:100%; margin-top:20px; }
+        .btn-pilar {
+            all:unset; cursor:pointer; display:flex; flex-direction:column; align-items:center; text-align:center;
+            background:var(--card); border:1px solid var(--border); border-radius:20px; padding:30px 20px;
+            box-shadow:0 10px 20px rgba(0,0,0,0.02); transition:all 0.3s; position:relative; overflow:hidden;
+        }
+        .btn-pilar::after {
+            content:''; position:absolute; bottom:0; left:0; width:100%; height:4px;
+            background:linear-gradient(90deg, var(--vino), var(--dorado-dark));
+            transform:scaleX(0); transform-origin:left; transition:transform 0.3s;
+        }
+        .btn-pilar:hover { transform:translateY(-5px); border-color:var(--dorado-dark); box-shadow:0 15px 30px rgba(105, 28, 50, 0.1); }
+        .btn-pilar:hover::after { transform:scaleX(1); }
+        .btn-icon { width:80px; height:80px; background:linear-gradient(135deg, rgba(105,28,50,0.1), rgba(188,149,92,0.1)); border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin-bottom:15px; border:1px solid rgba(188,149,92,0.3); }
+        .btn-num { font-size:0.7rem; font-weight:800; color:var(--dorado-dark); letter-spacing:1px; text-transform:uppercase; margin-bottom:5px; }
+        .btn-title { font-size:1.2rem; font-weight:700; color:var(--vino); margin-bottom:8px; }
+        .btn-hint { font-size:0.8rem; color:var(--muted); }
+
+        /* ── CONTROLES ── */
+        #progress-bar { position:fixed; bottom:0; left:0; height:4px; background:var(--dorado-dark); z-index:100; transition:width 0.4s; }
+        .nav-btn {
+            position:fixed; bottom:30px; z-index:100; background:var(--card); color:var(--vino);
+            border:1px solid var(--border); padding:10px 20px; border-radius:30px;
+            font-weight:700; font-size:.85rem; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.05); transition:0.2s;
+        }
+        .nav-btn:hover { background:var(--vino); color:#fff; border-color:var(--vino); }
+        #btn-prev { left:30px; }
+        #btn-next { right:30px; }
+        #slide-counter { position:fixed; bottom:36px; left:50%; transform:translateX(-50%); display:flex; gap:10px; z-index:100; }
+        .dot { width:10px; height:10px; border-radius:50%; background:var(--border); cursor:pointer; transition:0.3s; }
+        .dot.active { background:var(--vino); transform:scale(1.3); }
+
+        /* ── MODALES ── */
+        .modal-overlay {
+            position:fixed; inset:0; background:rgba(15, 23, 42, 0.85); backdrop-filter:blur(8px);
+            z-index:999; display:flex; align-items:center; justify-content:center; padding:20px;
+            opacity:0; pointer-events:none; transition:0.3s;
+        }
+        .modal-overlay.open { opacity:1; pointer-events:all; }
+        .modal-box {
+            background:var(--card); border-radius:20px; width:100%; max-width:900px; max-height:85vh;
+            display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px rgba(0,0,0,0.25);
+            transform:translateY(20px) scale(0.98); transition:0.3s;
+        }
+        .modal-overlay.open .modal-box { transform:translateY(0) scale(1); }
+        .modal-header { display:flex; align-items:center; gap:15px; padding:20px 25px; border-bottom:1px solid var(--border); background:rgba(105,28,50,0.03); }
+        .mh-icon { width:45px; height:45px; background:var(--vino); color:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+        .mh-info { flex:1; }
+        .mh-num { font-size:0.7rem; color:var(--dorado-dark); font-weight:800; text-transform:uppercase; }
+        .mh-title { font-size:1.2rem; font-weight:800; color:var(--vino); }
+        .close-btn { all:unset; cursor:pointer; width:36px; height:36px; border-radius:50%; background:var(--bg); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:bold; color:var(--muted); transition:0.2s; }
+        .close-btn:hover { background:#fee2e2; color:#ef4444; border-color:#fca5a5; }
+        .modal-body { display:flex; flex:1; overflow:hidden; }
+        .modal-img-panel { width:45%; padding:25px; border-right:1px solid var(--border); display:flex; flex-direction:column; gap:15px; overflow-y:auto; }
+        .modal-text-panel { flex:1; padding:25px; overflow-y:auto; display:flex; flex-direction:column; gap:15px; }
+        
+        .img-ph { flex:1; min-height:200px; border:2px dashed var(--dorado); border-radius:15px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--dorado-dark); text-align:center; background:rgba(188,149,92,0.05); }
+        .img-ph img { width:100%; height:100%; object-fit:contain; border-radius:15px; display:none; }
+        .img-ph.has-img { border:none; background:none; }
+        .img-ph.has-img img { display:block; }
+        .img-ph.has-img span, .img-ph.has-img svg { display:none; }
+
+        .m-points { list-style:none; display:flex; flex-direction:column; gap:10px; }
+        .m-points li { display:flex; align-items:center; gap:12px; background:var(--bg); padding:12px 16px; border-radius:12px; border:1px solid var(--border); }
+        .btn-detail { margin-left:auto; all:unset; cursor:pointer; padding:6px 12px; border-radius:15px; background:rgba(105,28,50,0.1); color:var(--vino); font-size:0.75rem; font-weight:700; transition:0.2s; }
+        .btn-detail:hover { background:var(--vino); color:#fff; }
+
+        /* ── SUB-MODAL ── */
+        .sub-overlay { position:fixed; inset:0; z-index:1000; background:rgba(15,23,42,0.7); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.3s; backdrop-filter:blur(4px); }
+        .sub-overlay.open { opacity:1; pointer-events:all; }
+        .sub-box { background:var(--card); width:100%; max-width:500px; border-radius:20px; padding:25px; box-shadow:0 20px 40px rgba(0,0,0,0.2); transform:scale(0.9); transition:0.3s; border:1px solid var(--dorado-dark); }
+        .sub-overlay.open .sub-box { transform:scale(1); }
+        .sub-header { display:flex; align-items:center; gap:10px; margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border); }
+        .sub-desc { font-size:0.95rem; color:var(--muted); line-height:1.6; }
+
+        /* ── FS VIEWER ── */
+        .fs-overlay { position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.3s; padding:20px; }
+        .fs-overlay.open { opacity:1; pointer-events:all; }
+        .fs-overlay img { max-width:95vw; max-height:95vh; object-fit:contain; border-radius:8px; border:1px solid var(--dorado); }
+        .fs-close { position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.1); color:#fff; border:none; width:40px; height:40px; border-radius:50%; font-size:1.5rem; cursor:pointer; }
+        .fs-close:hover { background:rgba(239,68,68,0.5); }
+
+    </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV BAR -->
+<div id="top-navbar">
+    <span class="brand">🏛️ Equipo 3 RyNM</span>
+    <a href="index.html">🖥️ Presentación</a>
+    <a href="MapaConceptual_Indicadores.html">🗺️ Mapa</a>
+    <a href="Crucigrama_Indicadores.html">🧩 Crucigrama</a>
+    <a href="MexicoEnElMundo.html">🌎 México</a>
+    <a href="EmpresasSecundarias.html">🏭 Sector Secundario</a>
+    <a href="CadenaDigital.html">🔗 Cadena Digital</a>
+    <a href="serviciosPublicos.html" class="active-tab">🏛️ Servicios Públicos</a>
+</div>
+
+<div class="slide-wrapper">
+
+    <!-- SLIDE 0: HERO -->
+    <section class="slide active">
+        <div class="hero-layout">
+            <div class="hero-text">
+                <div class="tag anim">Situación Actual 2026</div>
+                <h1 class="slide-title anim d1">De la Burocracia a la<br><span style="color:var(--dorado-dark);">Eficiencia Digital.</span></h1>
+                <p class="slide-sub anim d2" style="text-align:left;">
+                    Identificación y resolución de barreras tecnológicas en los servicios públicos, salud, educación y trámites ciudadanos en México.
+                </p>
+                <div style="margin-top:30px; display:flex; gap:20px;" class="anim d3">
+                    <div style="background:var(--card); padding:15px; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,0.02);">
+                        <strong style="color:var(--vino); font-size:1.2rem;">4</strong> <span style="font-size:0.8rem; color:var(--muted);">Fallas Críticas</span>
+                    </div>
+                    <div style="background:var(--card); padding:15px; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,0.02);">
+                        <strong style="color:var(--esmeralda); font-size:1.2rem;">4</strong> <span style="font-size:0.8rem; color:var(--muted);">Pilares de Solución</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-img anim d2">
+                <div class="hero-img-box">
+                    <span style="font-size:3rem; margin-bottom:10px;">📱</span>
+                    <p style="font-size:0.85rem;">[ Banner / Imagen Hero ]<br>Ciudadanos usando interfaces digitales de gobierno.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 1: EL PROBLEMA -->
+    <section class="slide">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+            <div class="tag anim">Análisis de la Problemática</div>
+            <h2 class="slide-title anim d1">Las 4 <span style="color:var(--vino-light);">Fallas Críticas</span></h2>
+            <p class="slide-sub anim d1">El rezago tecnológico del Estado se traduce en horas perdidas, corrupción sistemática y exclusión social estructurada.</p>
+            
+            <div class="grid-4 anim d2">
+                <div class="card">
+                    <span class="card-icon">💾</span>
+                    <h3>Sistemas Obsoletos (Legacy)</h3>
+                    <p>Interrupciones constantes en bases de datos de salud (IMSS/ISSSTE). Nula interoperabilidad; cada dependencia opera como una isla aislada.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">📉</span>
+                    <h3>Brecha de Infraestructura</h3>
+                    <p>Falta de ancho de banda y conectividad en zonas rurales y escuelas públicas, dejando fuera a más de 30 millones de ciudadanos del acceso digital.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🦹</span>
+                    <h3>Ciberseguridad Vulnerable</h3>
+                    <p>Alto índice de ataques informáticos. Ministerios sufren secuestro de datos (ransomware) y filtración constante de bases de datos ciudadanas.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🗄️</span>
+                    <h3>Burocracia y Opacidad</h3>
+                    <p>Trámites redundantes que requieren presencia física y copias impresas, fomentando cuellos de botella y enriqueciendo el "coyotaje".</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 2: TRANSICION -->
+    <section class="slide">
+        <div style="display:flex; flex-direction:column; align-items:center; text-align:center; max-width:800px;">
+            <div class="tag anim">Nuevo Paradigma</div>
+            <h2 class="slide-title anim d1" style="font-size:3.5rem;">Cerrando la <span style="color:var(--dorado-dark);">Brecha</span></h2>
+            <p class="slide-sub anim d2" style="font-size:1.3rem; margin-top:20px;">
+                La digitalización de los servicios públicos no es solo un tema de infraestructura tecnológica, es una cuestión de <strong>Justicia Social</strong> y competitividad global.
+            </p>
+            <div class="anim d3" style="width:100px; height:4px; background:var(--dorado-dark); margin-top:30px; border-radius:2px;"></div>
+        </div>
+    </section>
+
+    <!-- SLIDE 3: SOLUCIONES (PILARES INTERACTIVOS) -->
+    <section class="slide">
+        <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+            <div class="tag anim">Marco Estratégico</div>
+            <h2 class="slide-title anim d1">Pilares de <span style="color:var(--esmeralda);">Intervención</span></h2>
+            <p class="slide-sub anim d1">Haz clic en cada pilar para desplegar la arquitectura de la propuesta técnica.</p>
+
+            <div class="pilares-grid anim d2">
+                <button class="btn-pilar" onclick="openModal(0)">
+                    <div class="btn-icon">🆔</div>
+                    <span class="btn-num">Pilar 01</span>
+                    <span class="btn-title">Identidad Digital Única</span>
+                    <span class="btn-hint">👆 Clic para explorar</span>
+                </button>
+
+                <button class="btn-pilar" onclick="openModal(1)">
+                    <div class="btn-icon">☁️</div>
+                    <span class="btn-num">Pilar 02</span>
+                    <span class="btn-title">Interoperabilidad en la Nube</span>
+                    <span class="btn-hint">👆 Clic para explorar</span>
+                </button>
+
+                <button class="btn-pilar" onclick="openModal(2)">
+                    <div class="btn-icon">🛡️</div>
+                    <span class="btn-num">Pilar 03</span>
+                    <span class="btn-title">Ciberdefensa Proactiva</span>
+                    <span class="btn-hint">👆 Clic para explorar</span>
+                </button>
+
+                <button class="btn-pilar" onclick="openModal(3)">
+                    <div class="btn-icon">📡</div>
+                    <span class="btn-num">Pilar 04</span>
+                    <span class="btn-title">Infraestructura Descentralizada</span>
+                    <span class="btn-hint">👆 Clic para explorar</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 4: IMPACTO SOCIAL -->
+    <section class="slide">
+        <div style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+            <div class="tag anim">Resultados Proyectados</div>
+            <h2 class="slide-title anim d1">El Impacto <span style="color:var(--vino-light);">Social</span></h2>
+            <p class="slide-sub anim d1">Un Estado que se mueve a la velocidad de las necesidades del ciudadano contemporáneo.</p>
+
+            <div class="grid-3 anim d2">
+                <div class="card" style="text-align:center; padding:40px 20px;">
+                    <span class="card-icon" style="font-size:3.5rem;">⏳</span>
+                    <h3 style="color:var(--dorado-dark);">Ahorro de Tiempo</h3>
+                    <p>Reducción drástica de procesos: de 20 horas formadas en dependencias físicas a apenas <strong>10 minutos</strong> vía digital.</p>
+                </div>
+                <div class="card" style="text-align:center; padding:40px 20px;">
+                    <span class="card-icon" style="font-size:3.5rem;">⚖️</span>
+                    <h3 style="color:var(--esmeralda);">Cero Corrupción</h3>
+                    <p>Trazabilidad absoluta de trámites y eliminación del factor de discrecionalidad. Cero intermediarios ("coyotes") y pago fácil seguro.</p>
+                </div>
+                <div class="card" style="text-align:center; padding:40px 20px;">
+                    <span class="card-icon" style="font-size:3.5rem;">🤝</span>
+                    <h3 style="color:var(--vino);">Equidad de Acceso</h3>
+                    <p>Estandarización de calidad: Los mismos servicios, velocidad y expedientes electrónicos para grandes ciudades y comunidades rurales.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- COMPONENTES UI FIJOS -->
+<div id="progress-bar" style="width:20%;"></div>
+<button class="nav-btn" id="btn-prev">← Anterior</button>
+<button class="nav-btn" id="btn-next">Siguiente →</button>
+<div id="slide-counter">
+    <div class="dot active" data-slide="0"></div>
+    <div class="dot" data-slide="1"></div>
+    <div class="dot" data-slide="2"></div>
+    <div class="dot" data-slide="3"></div>
+    <div class="dot" data-slide="4"></div>
+</div>
+
+<!-- MODAL PRINCIPAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="mh-icon" id="m-icon">⚙️</div>
+            <div class="mh-info">
+                <div class="mh-num" id="m-num">Pilar 00</div>
+                <div class="mh-title" id="m-title">Título del Pilar</div>
+            </div>
+            <button class="close-btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-img-panel">
+                <div class="img-ph" id="m-img-box">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <span style="font-size:0.8rem; margin-top:10px;">[ Espacio Imagen/Gráfica ]</span>
+                    <img id="m-img-src" src="" alt="">
+                </div>
+                <p id="m-img-caption" style="font-size:0.8rem; color:var(--muted); text-align:center; font-style:italic;"></p>
+                <button class="btn-detail" onclick="openFullscreen()" style="margin:0 auto;"><span style="font-size:1.1rem;">🔍</span> Ver Pantalla Completa</button>
+            </div>
+            <div class="modal-text-panel">
+                <p id="m-desc" style="font-size:0.95rem; color:var(--text); line-height:1.6;"></p>
+                <ul class="m-points" id="m-points-list">
+                    <!-- Se llena con JS -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SUB-MODAL DETALLE -->
+<div class="sub-overlay" id="sub-overlay" onclick="if(event.target===this) closeSub()">
+    <div class="sub-box">
+        <div class="sub-header">
+            <span id="sm-icon" style="font-size:1.5rem; background:rgba(105,28,50,0.1); width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px;"></span>
+            <h3 id="sm-title" style="color:var(--vino); font-size:1.1rem;"></h3>
+            <button class="close-btn" onclick="closeSub()" style="margin-left:auto; width:30px; height:30px;">✕</button>
+        </div>
+        <p class="sub-desc" id="sm-desc"></p>
+    </div>
+</div>
+
+<!-- FULLSCREEN IMAGE -->
+<div class="fs-overlay" id="fs-overlay" onclick="closeFullscreen()">
+    <button class="fs-close">✕</button>
+    <img id="fs-img" src="" alt="" onclick="event.stopPropagation()">
+</div>
+
+<script>
+    // ── DATA MODALES ──
+    const modalsData = [
+        {
+            icon: '🆔', num: 'Pilar 01', title: 'Identidad Digital Única',
+            imgSrc: '', caption: 'Implementación de biometría y claves encriptadas conectadas al RENAPO.',
+            desc: 'Estandarización de las credenciales de identificación a nivel federal, usando tecnología blockchain para certificar la veracidad de la identidad del ciudadano de forma segura y portable.',
+            points: [
+                { icon: '🤳', title: 'Biometría y e-Firma', text: 'Sustitución de copias físicas (INE, CURP, Acta de Nacimiento) por un portafolio digital encriptado validado facial y/o dactilarmente.' },
+                { icon: '⛓️', title: 'Registro Blockchain', text: 'El historial de validaciones es inmutable, erradicando el robo de identidad o la creación de perfiles falsos.' },
+                { icon: '🔑', title: 'Single Sign-On (SSO)', text: 'Un solo inicio de sesión oficial permite acceder a los portales del SAT, IMSS y trámites vehiculares sin re-registros.' }
+            ]
+        },
+        {
+            icon: '☁️', num: 'Pilar 02', title: 'Interoperabilidad en la Nube',
+            imgSrc: '', caption: 'Arquitectura Cloud Gubernamental para escalabilidad interinstitucional.',
+            desc: 'Migración masiva de los obsoletos servidores físicos ubicados en sótanos de secretarías, hacia una "Nube Nacional Autónoma" que permite la comunicación instantánea e interinstitucional.',
+            points: [
+                { icon: '🏥', title: 'Expediente Clínico Universal', text: 'Sin importar si el ciudadano se atiende en IMSS, ISSSTE o sector privado, su perfil de salud viaja con él de forma inmediata.' },
+                { icon: '🔄', title: 'APIs Gubernamentales', text: 'Sistemas que "hablan" entre sí. Si cambias de domicilio en el INE, automáticamente se actualiza en CFE y Agua.' },
+                { icon: '📈', title: 'Alta Disponibilidad', text: 'Se acaba el clásico excusa de "Se cayó el sistema". Nubes distribuidas garantizan un uptime (tiempo en línea) del 99.99%.' }
+            ]
+        },
+        {
+            icon: '🛡️', num: 'Pilar 03', title: 'Ciberdefensa Proactiva',
+            imgSrc: '', caption: 'Centro de Operaciones de Seguridad (SOC) nacional impulsado por IA.',
+            desc: 'Construcción de una barrera cibernética centralizada encargada de repeler intrusiones en toda la infraestructura crítica del Estado (hospitales, redes eléctricas y registros de población).',
+            points: [
+                { icon: '🤖', title: 'Monitoreo IA', text: 'Modelos de Machine Learning identifican tráfico malicioso o intentos de exfiltración de datos antes de que se consume la intrusión.' },
+                { icon: '🔐', title: 'Datos Encriptados (E2E)', text: 'Desde la base de datos hasta la pantalla del funcionario, toda solicitud de información es cifrada extremo a extremo.' },
+                { icon: '🚨', title: 'Respuesta Automática', text: 'Ante la detección de ransomware, el sistema aísla el servidor infectado en milisegundos, salvando el resto de la sub-red.' }
+            ]
+        },
+        {
+            icon: '📡', num: 'Pilar 04', title: 'Infraestructura Descentralizada',
+            imgSrc: '', caption: 'Redes de conexión híbrida (Fibra Óptica / Satelital LEO).',
+            desc: 'Llevar los servicios digitales del Estado hacia la última milla utilizando tecnologías de despliegue rápido que no dependen del cableado terrestre tradicional.',
+            points: [
+                { icon: '🛰️', title: 'Internet Satelital (LEO)', text: 'Instalación de antenas con constelaciones satelitales bajas (tipo Starlink) en las 5,000 escuelas públicas más alejadas.' },
+                { icon: '🚌', title: 'Módulos Móviles de Trámite', text: 'Vehículos gubernamentales equipados con puntos de acceso de alta velocidad para visitar zonas indígenas.' },
+                { icon: '📡', title: 'Micro-Data Centers terrestres', text: 'Procesamiento en el "borde" (Edge computing) para áreas locales, evitando latencias al conectarse directo a CDMX.' }
+            ]
+        }
+    ];
+
+    let activeModalIdx = 0;
+
+    function openModal(idx) {
+        activeModalIdx = idx;
+        const data = modalsData[idx];
+        document.getElementById('m-icon').textContent = data.icon;
+        document.getElementById('m-num').textContent = data.num;
+        document.getElementById('m-title').textContent = data.title;
+        document.getElementById('m-desc').textContent = data.desc;
+        
+        const imgBox = document.getElementById('m-img-box');
+        const imgSrc = document.getElementById('m-img-src');
+        if (data.imgSrc) {
+            imgBox.classList.add('has-img'); imgSrc.src = data.imgSrc;
+        } else {
+            imgBox.classList.remove('has-img'); imgSrc.src = '';
+        }
+        document.getElementById('m-img-caption').textContent = data.caption;
+
+        const list = document.getElementById('m-points-list');
+        list.innerHTML = data.points.map((p, i) => `
+            <li>
+                <span style="font-size:1.5rem;">${p.icon}</span>
+                <span style="font-weight:700; color:var(--vino); flex:1;">${p.title}</span>
+                <button class="btn-detail" onclick="openSub(${i})">Revisar &rsaquo;</button>
+            </li>
+        `).join('');
+
+        document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+    function openSub(pIdx) {
+        const p = modalsData[activeModalIdx].points[pIdx];
+        document.getElementById('sm-icon').textContent = p.icon;
+        document.getElementById('sm-title').textContent = p.title;
+        document.getElementById('sm-desc').innerHTML = p.text;
+        document.getElementById('sub-overlay').classList.add('open');
+    }
+
+    function closeSub() { document.getElementById('sub-overlay').classList.remove('open'); }
+
+    function openFullscreen() {
+        const src = modalsData[activeModalIdx].imgSrc;
+        if (!src) return alert("Placeholder: No hay imagen configurada aún.");
+        document.getElementById('fs-img').src = src;
+        document.getElementById('fs-overlay').classList.add('open');
+    }
+    function closeFullscreen() { document.getElementById('fs-overlay').classList.remove('open'); }
+
+    // ── NAVEGACIÓN SLIDES ──
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    const bar = document.getElementById('progress-bar');
+    let current = 0, isAnim = false;
+
+    function goTo(idx) {
+        if(idx === current || isAnim) return;
+        isAnim = true;
+        const dir = idx > current ? 'left' : 'right';
+        slides[current].classList.add(dir === 'left' ? 'exit-left' : 'exit-right');
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        current = idx;
+        slides[current].classList.remove('exit-left', 'exit-right');
+        slides[current].classList.add('active');
+        dots[current].classList.add('active');
+        bar.style.width = ((current+1) / slides.length * 100) + '%';
+        
+        setTimeout(() => {
+            slides.forEach(s => { if(s!==slides[current]) s.classList.remove('exit-left', 'exit-right'); });
+            isAnim = false;
+        }, 600);
+    }
+
+    document.getElementById('btn-prev').onclick = () => goTo(Math.max(0, current - 1));
+    document.getElementById('btn-next').onclick = () => goTo(Math.min(slides.length - 1, current + 1));
+    dots.forEach((d, i) => d.onclick = () => goTo(i));
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            if (document.getElementById('fs-overlay').classList.contains('open')) return closeFullscreen();
+            if (document.getElementById('sub-overlay').classList.contains('open')) return closeSub();
+            if (document.getElementById('modal-overlay').classList.contains('open')) return closeModal();
+        }
+        if(!document.getElementById('modal-overlay').classList.contains('open')){
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(Math.min(slides.length - 1, current + 1));
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(Math.max(0, current - 1));
+        }
+    });
+
+    // ── NET ANIMATION (Light theme focus) ──
+    const cv = document.getElementById('bg-canvas');
+    const ctx = cv.getContext('2d');
+    let W, H, nodes = [];
+    function rs() { W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+    window.onresize = rs; rs();
+    for(let i=0; i<60; i++){
+        nodes.push({ x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5, type:Math.random()>0.8?'gold':'red' });
+    }
+    function draw(){
+        ctx.clearRect(0,0,W,H);
+        for(let i=0; i<nodes.length; i++){
+            let n = nodes[i];
+            n.x+=n.vx; n.y+=n.vy;
+            if(n.x<0||n.x>W) n.vx*=-1; if(n.y<0||n.y>H) n.vy*=-1;
+            
+            for(let j=i+1; j<nodes.length; j++){
+                let n2 = nodes[j];
+                let d = Math.hypot(n.x-n2.x, n.y-n2.y);
+                if(d < 150) {
+                    ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(n2.x, n2.y);
+                    ctx.strokeStyle = `rgba(105, 28, 50, ${(1-d/150)*0.15})`;
+                    ctx.lineWidth = 1; ctx.stroke();
+                }
+            }
+            ctx.beginPath(); ctx.arc(n.x, n.y, 2.5, 0, Math.PI*2);
+            ctx.fillStyle = n.type === 'gold' ? 'rgba(188,149,92,0.8)' : 'rgba(105,28,50,0.4)';
+            ctx.fill();
+        }
+        requestAnimationFrame(draw);
+    }
+    draw();
+
+</script>
+</body>
+</html>
